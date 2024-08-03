@@ -3,11 +3,7 @@ import { Button } from '@/components/custom/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { useAuth } from '@/pages/auth/use-auth.hook';
@@ -43,6 +39,7 @@ function useLogoutQuery({ enabled }: { enabled: boolean }) {
 
 export function UserNav() {
   const [isLogout, setIsLogout] = useState(false)
+
   useLogoutQuery({ enabled: isLogout })
   function handleLogout() {
     setIsLogout(!isLogout)
@@ -71,7 +68,6 @@ export function UserNav() {
 
         <DropdownMenuItem onClick={handleLogout}>
           Log out
-          <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

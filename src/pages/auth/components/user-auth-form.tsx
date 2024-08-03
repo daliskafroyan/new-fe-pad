@@ -17,8 +17,9 @@ import { Button } from '@/components/custom/button'
 import { PasswordInput } from '@/components/custom/password-input'
 import { cn } from '@/lib/utils'
 import { useAuth } from '../use-auth.hook'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import api from '@/api'
+import useLocalStorage from '@/hooks/use-local-storage'
 
 interface UserAuthFormProps extends HTMLAttributes<HTMLDivElement> { }
 
@@ -53,6 +54,8 @@ type LoginResponse = {
 function useLoginMutation() {
   const { login } = useAuth();
   const navigate = useNavigate();
+  const [_, setExpirationTime] = useLocalStorage<string | null>({ defaultValue: null, key: 'expiration-time' });
+
 
   const loginMutation = useMutation({
     async mutationFn(bodyReq: LoginRequest) {
@@ -61,7 +64,7 @@ function useLoginMutation() {
 
         login(data.data.token);
         navigate("/", { replace: true });
-
+        setExpirationTime(data.data.expirationTime)
 
         return data.data;
       } catch (error) {
@@ -71,6 +74,38 @@ function useLoginMutation() {
   });
 
   return loginMutation
+}
+
+export type GetUserDetailsResponse = {
+  message: string
+  code: number
+  status: boolean
+  data: {
+    email: string
+    client_id: string
+    status: boolean
+    next_login: number
+    is_verifikasi: boolean
+    id_roles: number
+    is_update_password: boolean
+  }
+}
+
+
+function useGetUserDetail({ enabled }: { enabled: boolean }) {
+  const [userDetails, setUserDetails] = useLocalStorage<GetUserDetailsResponse['data'] | null>({ defaultValue: null, key: 'user' });
+
+  return useQuery({
+    queryKey: ['users/detail-users'],
+    queryFn: async () => {
+      const { data } = await api.get<GetUserDetailsResponse>("/users/detail-users")
+
+      setUserDetails(data.data)
+
+      return data.data
+    },
+    enabled
+  });
 }
 
 export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
@@ -83,6 +118,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
   })
 
   const loginMutation = useLoginMutation()
+  useGetUserDetail({ enabled: loginMutation.isSuccess })
 
   function onSubmit(data: z.infer<typeof formSchema>) {
     loginMutation.mutate(data)
