@@ -1,9 +1,39 @@
+import { generateSidelinks, SideLink } from "@/data/sidelinks";
+import { useAuthStore } from "@/store/authStore";
 import { type ClassValue, clsx } from "clsx"
 import { useState } from "react";
 import { twMerge } from "tailwind-merge"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
+}
+
+function flattenSidelinks(sidelinks: SideLink[]): string[] {
+  return sidelinks.reduce((acc: string[], item: SideLink) => {
+    if (item.href) {
+      acc.push(item.href);
+    }
+    if (item.sub) {
+      acc.push(...flattenSidelinks(item.sub));
+    }
+    return acc;
+  }, []);
+}
+
+export function getUserRoutes(): string[] {
+  const userAuthorization = useAuthStore(state => state.userAuthorization);
+
+  if (!userAuthorization) {
+    return [];
+  }
+
+  const sidelinks = generateSidelinks(userAuthorization);
+  return flattenSidelinks(sidelinks);
+}
+
+export function hasRouteAccess(route: string): boolean {
+  const userRoutes = getUserRoutes();
+  return userRoutes.includes(route);
 }
 
 export const useLocalStorage = <T>(

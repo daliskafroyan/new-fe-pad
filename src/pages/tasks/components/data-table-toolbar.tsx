@@ -20,7 +20,7 @@ export function DataTableToolbar<TData>({
   return (
     <div className='flex items-center justify-between'>
       <div className='flex flex-1 flex-col-reverse items-start gap-y-2 sm:flex-row sm:items-center sm:space-x-2'>
-        <Input
+        {/* <Input
           placeholder='Filter tasks...'
           value={(table.getColumn('title')?.getFilterValue() as string) ?? ''}
           onChange={(event) =>
@@ -53,7 +53,7 @@ export function DataTableToolbar<TData>({
             Reset
             <Cross2Icon className='ml-2 h-4 w-4' />
           </Button>
-        )}
+        )} */}
       </div>
       <DataTableViewOptions table={table} />
     </div>
