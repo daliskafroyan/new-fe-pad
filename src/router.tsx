@@ -1,4 +1,4 @@
-import { createBrowserRouter } from 'react-router-dom'
+import { createBrowserRouter, Navigate } from 'react-router-dom'
 import GeneralError from './pages/errors/general-error'
 import NotFoundError from './pages/errors/not-found-error'
 import MaintenanceError from './pages/errors/maintenance-error'
@@ -32,10 +32,14 @@ const router = createBrowserRouter([
       const AppShell = await import('./components/app-shell')
       return { Component: AppShell.default }
     },
-    errorElement: <GeneralError />,
+    // errorElement: <GeneralError />,
     children: [
       {
         index: true,
+        element: <Navigate to="/dashboard" replace />
+      },
+      {
+        path: 'dashboard',
         lazy: async () => ({
           Component: (await import('./pages/dashboard')).default,
         }),
@@ -104,8 +108,7 @@ const router = createBrowserRouter([
           {
             path: 'notifications',
             lazy: async () => ({
-              Component: (await import('./pages/settings/notifications'))
-                .default,
+              Component: (await import('./pages/settings/notifications')).default,
             }),
           },
           {
@@ -117,8 +120,7 @@ const router = createBrowserRouter([
           {
             path: 'error-example',
             lazy: async () => ({
-              Component: (await import('./pages/settings/error-example'))
-                .default,
+              Component: (await import('./pages/settings/error-example')).default,
             }),
             errorElement: <GeneralError className='h-[50svh]' minimal />,
           },
@@ -128,7 +130,7 @@ const router = createBrowserRouter([
   },
 
   // Error routes
-  { path: '/500', Component: GeneralError },
+  // { path: '/500', Component: GeneralError },
   { path: '/404', Component: NotFoundError },
   { path: '/503', Component: MaintenanceError },
   { path: '/401', Component: UnauthorisedError },

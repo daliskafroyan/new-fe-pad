@@ -1,3 +1,4 @@
+import { GetUserAuthorizationResponse } from '@/pages/auth/components/user-auth-form'
 import {
   IconApps,
   IconBarrierBlock,
@@ -34,11 +35,74 @@ export interface SideLink extends NavLink {
   sub?: NavLink[]
 }
 
+const iconsMap: Record<string, JSX.Element> = {
+  "Dashboard": <IconLayoutDashboard size={18} />,
+  "Tasks": <IconChecklist size={18} />,
+  "Chats": <IconMessages size={18} />,
+  "Apps": <IconApps size={18} />,
+  "Authentication": <IconUserShield size={18} />,
+  "Users": <IconUsers size={18} />,
+  "Requests": <IconRouteAltLeft size={18} />,
+  "Analysis": <IconChartHistogram size={18} />,
+  "Extra Components": <IconComponents size={18} />,
+  "Error Pages": <IconExclamationCircle size={18} />,
+  "Settings": <IconSettings size={18} />,
+  "Sign In (email + password)": <IconHexagonNumber1 size={18} />,
+  "Sign In (Box)": <IconHexagonNumber2 size={18} />,
+  "Sign Up": <IconHexagonNumber3 size={18} />,
+  "Forgot Password": <IconHexagonNumber4 size={18} />,
+  "OTP": <IconHexagonNumber5 size={18} />,
+  "Not Found": <IconError404 size={18} />,
+  "Internal Server Error": <IconServerOff size={18} />,
+  "Maintenance Error": <IconBarrierBlock size={18} />,
+  "Unauthorised Error": <IconLock size={18} />,
+  "Trucks": <IconTruck size={18} />,
+  "Cargos": <IconBoxSeam size={18} />
+};
+
+interface Menu {
+  nama_menu: string;
+  sub_menus: Array<{
+    nama_sub_menu: string | null;
+    url: string;
+  }>;
+}
+
+export function generateSidelinks(userAuthorization: any[] | null) {
+  if (!userAuthorization || !Array.isArray(userAuthorization)) {
+    return [];
+  }
+
+  return userAuthorization.flatMap(role => role.menus.map((menu: Menu) => {
+    const subMenus = menu.sub_menus
+      .filter(sub => sub.nama_sub_menu !== null)
+      .map(sub => ({
+        title: sub.nama_sub_menu ?? menu.nama_menu,
+        label: '',
+        href: sub.url,
+        icon: iconsMap[sub.nama_sub_menu ?? menu.nama_menu],
+      }));
+
+    const mainLink: SideLink = {
+      title: menu.nama_menu,
+      label: '',
+      href: subMenus.length === 0 ? menu.sub_menus[0]?.url : '',
+      icon: iconsMap[menu.nama_menu],
+    };
+
+    if (subMenus.length > 0) {
+      mainLink.sub = subMenus;
+    }
+
+    return mainLink;
+  }));
+}
+
 export const sidelinks: SideLink[] = [
   {
     title: 'Dashboard',
     label: '',
-    href: '/',
+    href: '/dashboard',
     icon: <IconLayoutDashboard size={18} />,
   },
   {

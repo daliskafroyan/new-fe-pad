@@ -4,7 +4,8 @@ import { Layout } from './custom/layout'
 import { Button } from './custom/button'
 import Nav from './nav'
 import { cn } from '@/lib/utils'
-import { sidelinks } from '@/data/sidelinks'
+import { generateSidelinks } from '@/data/sidelinks'
+import { useAuthStore } from '@/store/authStore'
 
 interface SidebarProps extends React.HTMLAttributes<HTMLElement> {
   isCollapsed: boolean
@@ -17,8 +18,8 @@ export default function Sidebar({
   setIsCollapsed,
 }: SidebarProps) {
   const [navOpened, setNavOpened] = useState(false)
+  const userAuthorization = useAuthStore(state => state.userAuthorization)
 
-  /* Make body not scrollable when navBar is opened */
   useEffect(() => {
     if (navOpened) {
       document.body.classList.add('overflow-hidden')
@@ -26,6 +27,12 @@ export default function Sidebar({
       document.body.classList.remove('overflow-hidden')
     }
   }, [navOpened])
+
+  if (!userAuthorization) {
+    return <div>Loading...</div>;
+  }
+
+  const sidelinks = generateSidelinks(userAuthorization)
 
   return (
     <aside

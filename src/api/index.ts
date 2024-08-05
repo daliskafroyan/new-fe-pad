@@ -1,19 +1,18 @@
+import { useAuthStore } from '@/store/authStore';
 import axios, { type AxiosError } from "axios";
 
 const api = axios.create({
     baseURL: `${import.meta.env.VITE_BACKEND_URL}`,
 });
 
-export default api
-
+export default api;
 
 api.interceptors.response.use(
     (response) => {
-        const token = window.localStorage.getItem('token');
-        const expirationTime = localStorage.getItem('expiration-time');
+        const { token, expirationTime, clearAuth } = useAuthStore.getState();
 
         if (expirationTime && new Date().getTime() > new Date(expirationTime).getTime()) {
-            window.localStorage.removeItem('token');
+            clearAuth();
             window.location.href = '/sign-in';
             return Promise.reject(new Error('Token expired'));
         }
@@ -23,7 +22,7 @@ api.interceptors.response.use(
         } else {
             delete response.headers['x-pendapatan'];
         }
-        return response
+        return response;
     },
     (error: AxiosError<{ message: string }>) => {
         throw new Error(error.response?.data.message);

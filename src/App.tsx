@@ -5,17 +5,15 @@ import { ThemeProvider } from "./components/theme-provider";
 import { RouterProvider } from "react-router-dom";
 import { Toaster } from "./components/ui/toaster";
 import router from "./router";
+import { useAuthStore } from "./store/authStore";
 
-export default function App() {
-    const queryClient = new QueryClient({
+function createQueryClient() {
+    return new QueryClient({
         queryCache: new QueryCache({
             onError: (error) => {
                 if (error.message === "Unauthenticated.") {
-                    // logout();
-                    window.localStorage.removeItem("token");
-                    // globalStore$.delete();
-                    window.location.replace("/sign-in");
-                    // navigate("/login", { replace: true });
+                    const clearAuth = useAuthStore.getState().clearAuth;
+                    clearAuth();
                 }
                 console.log(error);
                 return toast({
@@ -33,6 +31,10 @@ export default function App() {
             },
         }),
     });
+}
+
+export default function App() {
+    const queryClient = createQueryClient();
 
     return (
         <QueryClientProvider client={queryClient}>

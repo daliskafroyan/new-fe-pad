@@ -1,9 +1,8 @@
-import { HTMLAttributes, useState } from 'react'
+import { HTMLAttributes } from 'react'
 import { useForm } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router-dom'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { IconBrandFacebook, IconBrandGithub } from '@tabler/icons-react'
 import {
   Form,
   FormControl,
@@ -19,7 +18,7 @@ import { cn } from '@/lib/utils'
 import { useAuth } from '../use-auth.hook'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import api from '@/api'
-import useLocalStorage from '@/hooks/use-local-storage'
+import { useAuthStore } from '@/store/authStore'
 
 interface UserAuthFormProps extends HTMLAttributes<HTMLDivElement> { }
 
@@ -50,12 +49,9 @@ type LoginResponse = {
   }
 }
 
-
-function useLoginMutation() {
+function useLoginMutation(onSuccess: () => void) {
   const { login } = useAuth();
-  const navigate = useNavigate();
-  const [_, setExpirationTime] = useLocalStorage<string | null>({ defaultValue: null, key: 'expiration-time' });
-
+  const { setToken, setExpirationTime } = useAuthStore();
 
   const loginMutation = useMutation({
     async mutationFn(bodyReq: LoginRequest) {
@@ -63,14 +59,15 @@ function useLoginMutation() {
         const { data } = await api.post<LoginResponse>("/login", bodyReq);
 
         login(data.data.token);
-        navigate("/", { replace: true });
-        setExpirationTime(data.data.expirationTime)
+        setToken(data.data.token);
+        setExpirationTime(data.data.expirationTime);
 
         return data.data;
       } catch (error) {
         throw error
       }
     },
+    onSuccess,
   });
 
   return loginMutation
@@ -91,21 +88,61 @@ export type GetUserDetailsResponse = {
   }
 }
 
+export type GetUserAuthorizationResponse = {
+  message: string
+  code: number
+  listData: Array<{
+    nama_roles: string
+    menus: Array<{
+      nama_menu: string
+      sub_menus: Array<{
+        nama_sub_menu?: string
+        url: string
+        create_permission: boolean
+        read_permission: boolean
+        update_permission: boolean
+        delete_permission: boolean
+      }>
+    }>
+  }>
+}
 
-function useGetUserDetail({ enabled }: { enabled: boolean }) {
-  const [userDetails, setUserDetails] = useLocalStorage<GetUserDetailsResponse['data'] | null>({ defaultValue: null, key: 'user' });
 
-  return useQuery({
+function useGetUserDetail() {
+  const navigate = useNavigate();
+  const { setUserDetail, setUserAuthorization } = useAuthStore();
+
+  const userDetailQuery = useQuery({
     queryKey: ['users/detail-users'],
     queryFn: async () => {
       const { data } = await api.get<GetUserDetailsResponse>("/users/detail-users")
 
-      setUserDetails(data.data)
-
+      setUserDetail(data.data);
       return data.data
     },
-    enabled
+    enabled: false,
   });
+
+  const userAuthorizationQuery = useQuery({
+    queryKey: ['users/detail-rbac'],
+    queryFn: async () => {
+      const { data } = await api.get<GetUserAuthorizationResponse>("/users/detail-rbac")
+
+      setUserAuthorization(data.listData);
+      return data.listData
+    },
+    enabled: false,
+  });
+
+  const refetchUserDetail = async () => {
+    await userDetailQuery.refetch();
+    await userAuthorizationQuery.refetch()
+    const { userAuthorization, userDetail, expirationTime } = useAuthStore.getState();
+
+    if (userAuthorization && userDetail && expirationTime) navigate("/dashboard", { replace: true });
+  };
+
+  return refetchUserDetail;
 }
 
 export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
@@ -117,8 +154,8 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
     },
   })
 
-  const loginMutation = useLoginMutation()
-  useGetUserDetail({ enabled: loginMutation.isSuccess })
+  const refetchUserDetail = useGetUserDetail()
+  const loginMutation = useLoginMutation(refetchUserDetail)
 
   function onSubmit(data: z.infer<typeof formSchema>) {
     loginMutation.mutate(data)
@@ -166,7 +203,6 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
             <Button className='mt-2' loading={loginMutation.isPending}>
               Login
             </Button>
-
           </div>
         </form>
       </Form>
