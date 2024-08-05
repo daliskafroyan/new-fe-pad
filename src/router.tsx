@@ -64,9 +64,19 @@ const router = createBrowserRouter([
       },
       {
         path: 'users',
-        lazy: async () => ({
-          Component: (await import('@/components/coming-soon')).default,
-        }),
+        errorElement: <GeneralError />,
+        children: [
+          {
+            index: true,
+            element: <Navigate to="/users/list-users" replace />,
+          },
+          {
+            path: 'list-users',
+            lazy: async () => ({
+              Component: (await import('@/pages/users/user-management')).default,
+            }),
+          }
+        ]
       },
       {
         path: 'analysis',
