@@ -1,4 +1,3 @@
-import { GetUserAuthorizationResponse } from '@/pages/auth/components/user-auth-form'
 import {
   IconApps,
   IconBarrierBlock,
@@ -22,6 +21,8 @@ import {
   IconUserShield,
   IconUsers,
   IconLock,
+  IconUserCog,
+  IconLogout,
 } from '@tabler/icons-react'
 
 export interface NavLink {
@@ -37,17 +38,17 @@ export interface SideLink extends NavLink {
 
 const iconsMap: Record<string, JSX.Element> = {
   "Dashboard": <IconLayoutDashboard size={18} />,
-  "Tasks": <IconChecklist size={18} />,
-  "Chats": <IconMessages size={18} />,
-  "Apps": <IconApps size={18} />,
+  "Pengaturan": <IconUserCog size={18} />,
+  "User Management": <IconUsers size={18} />,
+  "Profile Users": <IconApps size={18} />,
   "Authentication": <IconUserShield size={18} />,
   "Users": <IconUsers size={18} />,
-  "Requests": <IconRouteAltLeft size={18} />,
+  "Keluar": <IconLogout size={18} />,
   "Analysis": <IconChartHistogram size={18} />,
   "Extra Components": <IconComponents size={18} />,
   "Error Pages": <IconExclamationCircle size={18} />,
   "Settings": <IconSettings size={18} />,
-  "Sign In (email + password)": <IconHexagonNumber1 size={18} />,
+  "Data Pendapatan": <IconHexagonNumber1 size={18} />,
   "Sign In (Box)": <IconHexagonNumber2 size={18} />,
   "Sign Up": <IconHexagonNumber3 size={18} />,
   "Forgot Password": <IconHexagonNumber4 size={18} />,
