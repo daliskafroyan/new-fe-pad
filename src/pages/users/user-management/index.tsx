@@ -312,7 +312,7 @@ export default function UserManagement() {
                                 })
                             }
                         }}
-                        disabled={!user.client_id}
+                        disabled={!user.client_id || user.id_roles === 1}
                     >
                         <SelectTrigger>
                             <SelectValue>{role?.nama_roles || 'Unknown Role'}</SelectValue>
