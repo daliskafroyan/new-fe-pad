@@ -206,7 +206,7 @@ function ResetUserButton({ clientId }: { clientId: string | null }) {
 
     return (
         <>
-            <TooltipProvider>
+            <TooltipProvider delayDuration={100}>
                 <Tooltip>
                     <TooltipTrigger asChild>
                         <Button
