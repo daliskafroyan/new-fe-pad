@@ -6,7 +6,7 @@ import { Layout } from '@/components/custom/layout'
 import { Search } from '@/components/search'
 import ThemeSwitch from '@/components/theme-switch'
 import { UserNav } from '@/components/user-nav'
-import { IconCirclePlus } from '@tabler/icons-react'
+import { IconCirclePlus, IconRefresh } from '@tabler/icons-react'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -18,6 +18,7 @@ import { ColumnDef } from '@tanstack/react-table'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { DataTable } from '@/pages/tasks/components/data-table'
 import { Checkbox } from '@/components/ui/checkbox'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 const addUserSchema = z.object({
     email: z.string().email('Invalid email address'),
@@ -178,6 +179,68 @@ function VerificationCheckbox({ user }: { user: User }) {
     )
 }
 
+function ResetUserButton({ clientId }: { clientId: string | null }) {
+    const [openDialog, setOpenDialog] = useState(false)
+    const queryClient = useQueryClient()
+
+    const resetUserMutation = useMutation({
+        mutationFn: async (clientId: string) => {
+            const response = await api.get(`/users/reset-users/${clientId}`)
+            return response.data
+        },
+        onSuccess: () => {
+            toast({
+                title: "Success",
+                description: "User has been reset successfully",
+            })
+            queryClient.invalidateQueries({ queryKey: ['users'] })
+        },
+    })
+
+    const handleReset = () => {
+        if (clientId) {
+            resetUserMutation.mutate(clientId)
+        }
+        setOpenDialog(false)
+    }
+
+    return (
+        <>
+            <TooltipProvider>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setOpenDialog(true)}
+                            disabled={!clientId}
+                        >
+                            <IconRefresh size={16} />
+                            <span className="sr-only">Reset User</span>
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        <p>Reset User</p>
+                    </TooltipContent>
+                </Tooltip>
+            </TooltipProvider>
+
+            <Dialog open={openDialog} onOpenChange={setOpenDialog}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Konfirmasi untuk reset user</DialogTitle>
+                    </DialogHeader>
+                    <p>Apakah anda yakin untuk reset user ini?</p>
+                    <div className="flex justify-end space-x-2">
+                        <Button variant="outline" onClick={() => setOpenDialog(false)}>Cancel</Button>
+                        <Button onClick={handleReset}>Confirm</Button>
+                    </div>
+                </DialogContent>
+            </Dialog>
+        </>
+    )
+}
+
 export default function UserManagement() {
     const usersQuery = useQuery<UserResponse>({
         queryKey: ['users'],
@@ -264,6 +327,11 @@ export default function UserManagement() {
                     </Select>
                 )
             },
+        },
+        {
+            id: 'actions',
+            header: 'Actions',
+            cell: ({ row }) => <ResetUserButton clientId={row.original.client_id} />,
         },
     ], [rolesQuery.data, updateRoleMutation])
 
