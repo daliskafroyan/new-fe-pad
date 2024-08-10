@@ -6,20 +6,29 @@ import { RouterProvider } from "react-router-dom";
 import { Toaster } from "./components/ui/toaster";
 import router from "./router";
 import { useAuthStore } from "./store/authStore";
+import { useAuth } from "./pages/auth/use-auth.hook";
 
 function createQueryClient() {
+    const { logout } = useAuth();
     return new QueryClient({
+        defaultOptions: {
+            queries: {
+                retry: false,
+            },
+        },
         queryCache: new QueryCache({
             onError: (error) => {
-                if (error.message === "Unauthenticated.") {
+                if (error.message === "Unauthenticated." || error.message === "Authentication failed") {
                     const clearAuth = useAuthStore.getState().clearAuth;
                     clearAuth();
+                    logout()
+                } else {
+                    console.log(error);
+                    toast({
+                        title: 'Error!',
+                        description: error.message,
+                    });
                 }
-                console.log(error);
-                return toast({
-                    title: 'Error!',
-                    description: error.message,
-                })
             },
         }),
         mutationCache: new MutationCache({

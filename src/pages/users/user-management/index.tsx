@@ -17,6 +17,7 @@ import api from '@/api'
 import { ColumnDef } from '@tanstack/react-table'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { DataTable } from '@/pages/tasks/components/data-table'
+import { Checkbox } from '@/components/ui/checkbox'
 
 const addUserSchema = z.object({
     email: z.string().email('Invalid email address'),
@@ -25,6 +26,7 @@ const addUserSchema = z.object({
 type AddUserFormValues = z.infer<typeof addUserSchema>
 
 type User = {
+    uuid: string
     email: string
     client_id: string | null
     status: boolean
@@ -122,6 +124,60 @@ function AddUserButton() {
     )
 }
 
+function VerificationCheckbox({ user }: { user: User }) {
+    const [openDialog, setOpenDialog] = useState(false)
+    const queryClient = useQueryClient()
+
+    const updateVerificationMutation = useMutation({
+        mutationFn: async ({ uuid }: { uuid: string }) => {
+            const response = await api.get(`/users/verifikasi/${uuid}`)
+            return response.data
+        },
+        onSuccess: () => {
+            toast({
+                title: "Success",
+                description: "User verification status updated successfully",
+            })
+            queryClient.invalidateQueries({ queryKey: ['users'] })
+        },
+    })
+
+    const handleVerificationChange = () => {
+
+        if (user.is_verifikasi) {
+            updateVerificationMutation.mutate({ uuid: user.uuid })
+        } else {
+            setOpenDialog(true)
+        }
+    }
+
+    const confirmVerification = () => {
+        updateVerificationMutation.mutate({ uuid: user.uuid })
+        setOpenDialog(false)
+    }
+
+    return (
+        <>
+            <Checkbox
+                checked={user.is_verifikasi}
+                onCheckedChange={handleVerificationChange}
+            />
+            <Dialog open={openDialog} onOpenChange={setOpenDialog}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Konfirmasi untuk verifikasi user</DialogTitle>
+                    </DialogHeader>
+                    <p>Apakah anda yakin untuk verifikasi user ini?</p>
+                    <div className="flex justify-end space-x-2">
+                        <Button variant="outline" onClick={() => setOpenDialog(false)}>Cancel</Button>
+                        <Button onClick={confirmVerification}>Confirm</Button>
+                    </div>
+                </DialogContent>
+            </Dialog>
+        </>
+    )
+}
+
 export default function UserManagement() {
     const usersQuery = useQuery<UserResponse>({
         queryKey: ['users'],
@@ -173,7 +229,7 @@ export default function UserManagement() {
         {
             accessorKey: 'is_verifikasi',
             header: 'Verified',
-            cell: ({ row }) => row.original.is_verifikasi ? 'Yes' : 'No',
+            cell: ({ row }) => <VerificationCheckbox user={row.original} />,
         },
         {
             accessorKey: 'id_roles',
