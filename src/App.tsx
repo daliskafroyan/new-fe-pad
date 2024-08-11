@@ -18,10 +18,12 @@ function createQueryClient() {
         },
         queryCache: new QueryCache({
             onError: (error) => {
-                if (error.message === "Unauthenticated." || error.message === "Authentication failed") {
+                if (error.message === "Unauthenticated." || error.message === "Authentication failed" || error.message === "Invalid authentication") {
                     const clearAuth = useAuthStore.getState().clearAuth;
                     clearAuth();
                     logout()
+                    localStorage.removeItem('token');
+                    window.location.href = '/';
                 } else {
                     console.log(error);
                     toast({
