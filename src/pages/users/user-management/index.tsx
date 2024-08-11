@@ -262,7 +262,7 @@ export default function UserManagement() {
 
     const updateRoleMutation = useMutation({
         mutationFn: async ({ clientId, roleId }: { clientId: string, roleId: number }) => {
-            const response = await api.post(`/users/update-roles/${clientId}`, { id_roles: roleId })
+            const response = await api.post(`/users/update-roles/${clientId}`, { idRoles: roleId.toString() })
             return response.data
         },
         onSuccess: () => {
