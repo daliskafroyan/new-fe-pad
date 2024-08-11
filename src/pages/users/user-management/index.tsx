@@ -300,31 +300,49 @@ export default function UserManagement() {
             cell: ({ row }) => {
                 const user = row.original
                 const role = rolesQuery.data?.list.find(r => r.id === user.id_roles)
+                const isUpdating = updateRoleMutation.isPending && updateRoleMutation.variables?.clientId === user.client_id
 
                 return (
-                    <Select
-                        defaultValue={user.id_roles.toString()}
-                        onValueChange={(newValue) => {
-                            if (user.client_id) {
-                                updateRoleMutation.mutate({
-                                    clientId: user.client_id,
-                                    roleId: parseInt(newValue, 10)
-                                })
-                            }
-                        }}
-                        disabled={!user.client_id || user.id_roles === 1}
-                    >
-                        <SelectTrigger>
-                            <SelectValue>{role?.nama_roles || 'Unknown Role'}</SelectValue>
-                        </SelectTrigger>
-                        <SelectContent>
-                            {rolesQuery.data?.list.map(role => (
-                                <SelectItem key={role.id} value={role.id.toString()}>
-                                    {role.nama_roles}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
+                    <>
+                        {isUpdating ? (
+                            <Button variant="ghost" disabled className="w-full justify-start">
+                                Updating..
+                            </Button>
+                        ) : (
+                            <Select
+                                defaultValue={user.id_roles.toString()}
+                                onValueChange={(newValue) => {
+                                    if (user.client_id) {
+                                        updateRoleMutation.mutate({
+                                            clientId: user.client_id,
+                                            roleId: parseInt(newValue, 10)
+                                        })
+                                    }
+                                }}
+                                disabled={!user.client_id || user.id_roles === 1 || isUpdating}
+                            >
+                                <SelectTrigger>
+                                    {/* {isUpdating ? (
+                                <Button variant="ghost" disabled className="w-full justify-start">
+                                    Updating...
+                                </Button>
+                            ) : (
+                                <SelectValue>{role?.nama_roles || 'Unknown Role'}</SelectValue>
+                            )} */}
+
+                                    <SelectValue>{role?.nama_roles || 'Unknown Role'}</SelectValue>
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {rolesQuery.data?.list.map(role => (
+                                        <SelectItem key={role.id} value={role.id.toString()}>
+                                            {role.nama_roles}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        )}
+                    </>
+
                 )
             },
         },
