@@ -144,7 +144,6 @@ function VerificationCheckbox({ user }: { user: User }) {
     })
 
     const handleVerificationChange = () => {
-
         if (user.is_verifikasi) {
             updateVerificationMutation.mutate({ uuid: user.uuid })
         } else {
@@ -262,7 +261,8 @@ export default function UserManagement() {
 
     const updateRoleMutation = useMutation({
         mutationFn: async ({ clientId, roleId }: { clientId: string, roleId: number }) => {
-            const response = await api.post(`/users/update-roles/${clientId}`, { idRoles: roleId.toString() })
+            const encodedClientId = encodeURIComponent(clientId)
+            const response = await api.post(`/users/update-roles/${encodedClientId}`, { idRoles: roleId.toString() })
             return response.data
         },
         onSuccess: () => {
@@ -322,14 +322,6 @@ export default function UserManagement() {
                                 disabled={!user.client_id || user.id_roles === 1 || isUpdating}
                             >
                                 <SelectTrigger>
-                                    {/* {isUpdating ? (
-                                <Button variant="ghost" disabled className="w-full justify-start">
-                                    Updating...
-                                </Button>
-                            ) : (
-                                <SelectValue>{role?.nama_roles || 'Unknown Role'}</SelectValue>
-                            )} */}
-
                                     <SelectValue>{role?.nama_roles || 'Unknown Role'}</SelectValue>
                                 </SelectTrigger>
                                 <SelectContent>
