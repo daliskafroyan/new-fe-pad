@@ -117,7 +117,7 @@ export default function Dashboard() {
                                         dataKey="value"
                                         label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                                     >
-                                        {expenseCategoriesData.map((entry, index) => (
+                                        {expenseCategoriesData.map((_, index) => (
                                             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                         ))}
                                     </Pie>
@@ -141,7 +141,7 @@ export default function Dashboard() {
                                     <YAxis dataKey="name" type="category" scale="band" />
                                     <Tooltip />
                                     <Bar dataKey="value" fill="#8884d8">
-                                        {expenseCategoriesData.map((entry, index) => (
+                                        {expenseCategoriesData.map((_, index) => (
                                             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                         ))}
                                     </Bar>

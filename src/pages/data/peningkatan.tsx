@@ -118,7 +118,7 @@ export default function Dashboard() {
                                         dataKey="value"
                                         label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                                     >
-                                        {expenseCategoriesData.map((entry, index) => (
+                                        {expenseCategoriesData.map((_, index) => (
                                             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                         ))}
                                     </Pie>
