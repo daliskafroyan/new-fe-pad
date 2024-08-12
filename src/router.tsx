@@ -136,6 +136,29 @@ const router = createBrowserRouter([
           },
         ],
       },
+      {
+        path: 'data',
+        children: [
+          {
+            path: 'kontribusi',
+            lazy: async () => ({
+              Component: (await import('./pages/data/kontribusi')).default,
+            }),
+          },
+          {
+            path: 'peningkatan',
+            lazy: async () => ({
+              Component: (await import('./pages/data/peningkatan')).default,
+            }),
+          },
+          {
+            path: 'Peringkat',
+            lazy: async () => ({
+              Component: (await import('./pages/data/peringkat')).default,
+            }),
+          },
+        ],
+      },
     ],
   },
 
