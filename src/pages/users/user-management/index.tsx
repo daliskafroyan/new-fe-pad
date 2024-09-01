@@ -184,7 +184,7 @@ function ResetUserButton({ clientId }: { clientId: string | null }) {
 
     const resetUserMutation = useMutation({
         mutationFn: async (clientId: string) => {
-            const response = await api.get(`/users/reset-users/${clientId}`)
+            const response = await api.post(`/users/reset-users`,{ clientId })
             return response.data
         },
         onSuccess: () => {
@@ -252,7 +252,7 @@ export default function UserManagement() {
     const rolesQuery = useQuery<RoleResponse>({
         queryKey: ['roles'],
         queryFn: async () => {
-            const response = await api.get("/users/list-roles")
+            const response = await api.get("/rbac/list-roles")
             return response.data
         },
     })
@@ -261,8 +261,7 @@ export default function UserManagement() {
 
     const updateRoleMutation = useMutation({
         mutationFn: async ({ clientId, roleId }: { clientId: string, roleId: number }) => {
-            const encodedClientId = encodeURIComponent(clientId)
-            const response = await api.post(`/users/update-roles/${encodedClientId}`, { idRoles: roleId.toString() })
+            const response = await api.put(`/users/update-roles`, { idRoles: roleId.toString(), clientId: clientId })
             return response.data
         },
         onSuccess: () => {
@@ -275,6 +274,10 @@ export default function UserManagement() {
     })
 
     const columns = useMemo<ColumnDef<User>[]>(() => [
+        {
+            accessorKey: 'id',
+            header: 'No',
+        },
         {
             accessorKey: 'email',
             header: 'Email',
