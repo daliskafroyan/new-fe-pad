@@ -127,6 +127,7 @@ function AddUserButton() {
 
 function VerificationCheckbox({ user }: { user: User }) {
     const [openDialog, setOpenDialog] = useState(false)
+    const [responseDialog, setResponseDialog] = useState<{ title: string, description: string, email?: string, passwordDefault?: string } | null>(null)
     const queryClient = useQueryClient()
 
     const updateVerificationMutation = useMutation({
@@ -134,12 +135,13 @@ function VerificationCheckbox({ user }: { user: User }) {
             const response = await api.get(`/users/verifikasi/${uuid}`)
             return response.data
         },
-        onSuccess: () => {
-            toast({
-                title: "Success",
-                description: "User verification status updated successfully",
+        onSuccess: (data) => {
+            setResponseDialog({
+                title: "Verifikasi Berhasil",
+                description: data.message,
+                email: user.email,
+                passwordDefault: data.data.passwordDefault,
             })
-            queryClient.invalidateQueries({ queryKey: ['users'] })
         },
     })
 
@@ -162,7 +164,10 @@ function VerificationCheckbox({ user }: { user: User }) {
                 checked={user.is_verifikasi}
                 onCheckedChange={handleVerificationChange}
             />
-            <Dialog open={openDialog} onOpenChange={setOpenDialog}>
+            <Dialog open={openDialog} onOpenChange={() => {
+                setOpenDialog(false)
+                queryClient.invalidateQueries({ queryKey: ['users'] })
+            }}>
                 <DialogContent>
                     <DialogHeader>
                         <DialogTitle>Konfirmasi untuk verifikasi user</DialogTitle>
@@ -174,6 +179,22 @@ function VerificationCheckbox({ user }: { user: User }) {
                     </div>
                 </DialogContent>
             </Dialog>
+            {responseDialog && (
+                <Dialog open={!!responseDialog} onOpenChange={() => setResponseDialog(null)}>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>{responseDialog.title}</DialogTitle>
+                        </DialogHeader>
+                        <div className="flex flex-col space-y-2">
+                            <p>Email: {responseDialog.email}</p>
+                            <p>Password Default: {responseDialog.passwordDefault}</p>
+                        </div>
+                        <div className="flex justify-end space-x-2">
+                            <Button onClick={() => setResponseDialog(null)}>Close</Button>
+                        </div>
+                    </DialogContent>
+                </Dialog>
+            )}
         </>
     )
 }
@@ -184,7 +205,7 @@ function ResetUserButton({ clientId }: { clientId: string | null }) {
 
     const resetUserMutation = useMutation({
         mutationFn: async (clientId: string) => {
-            const response = await api.post(`/users/reset-users`,{ clientId })
+            const response = await api.post(`/users/reset-users`, { clientId })
             return response.data
         },
         onSuccess: () => {
