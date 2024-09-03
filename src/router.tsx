@@ -75,6 +75,12 @@ const router = createBrowserRouter([
             lazy: async () => ({
               Component: (await import('@/pages/users/user-management')).default,
             }),
+          },
+          {
+            path: 'update/password',
+            lazy: async () => ({
+              Component: (await import('@/pages/users/update-password.page')).default,
+            }),
           }
         ]
       },
