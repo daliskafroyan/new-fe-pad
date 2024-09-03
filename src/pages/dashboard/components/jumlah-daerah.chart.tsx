@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { BarChart, Bar, Text, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, RadialBarChart, RadialBar, PolarGrid, PolarRadiusAxis, Label, PolarAngleAxis, Cell } from 'recharts';
+import { useState, useEffect } from 'react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, RadialBarChart, RadialBar, PolarRadiusAxis, Label, PolarAngleAxis, Cell } from 'recharts';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
@@ -23,8 +23,6 @@ type JumlahDaerahChartProps = {
     data: JumlahDaerahItem[];
     isLoading: boolean;
 };
-
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
 const chartConfig = {
     realisasi: {
@@ -83,11 +81,6 @@ export function JumlahDaerahChart({ data, isLoading }: JumlahDaerahChartProps) {
     }
 
     const selectedData = data.find(item => item.tahun === selectedYear) || data[0];
-
-    const pieData = [
-        { name: 'Realisasi', value: parseFloat(selectedData.persentase_sudah_r) },
-        { name: 'Belum Realisasi', value: parseFloat(selectedData.persentase_belum_r) },
-    ];
 
     const realisasiData = [
         { name: 'Daerah Realisasi', value: selectedData.jumlah_daerah_realisasi },
@@ -266,7 +259,7 @@ export function JumlahDaerahChart({ data, isLoading }: JumlahDaerahChartProps) {
                                     content={<ChartTooltipContent />}
                                 />
                                 <Bar dataKey="value" radius={[4, 4, 0, 0]}>
-                                    {targetData.map((entry, index) => (
+                                    {targetData.map((_, index) => (
                                         <Cell
                                             key={`cell-${index}`}
                                             fill={chartConfig[index === 0 ? 'target' : 'belumTarget'].color}
