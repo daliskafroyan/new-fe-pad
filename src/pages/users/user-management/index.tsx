@@ -1,12 +1,20 @@
 import { useState, useMemo } from 'react'
-import { Button } from '@/components/custom/button'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import {
+    ColumnDef,
+    flexRender,
+    getCoreRowModel,
+    useReactTable,
+} from "@tanstack/react-table"
 import { Input } from '@/components/ui/input'
-import { Layout } from '@/components/custom/layout'
-import { Search } from '@/components/search'
-import ThemeSwitch from '@/components/theme-switch'
-import { UserNav } from '@/components/user-nav'
-import { IconCirclePlus, IconRefresh } from '@tabler/icons-react'
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/components/ui/table"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -14,11 +22,24 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from '@/component
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast, useToast } from "@/components/ui/use-toast"
 import api from '@/api'
-import { ColumnDef } from '@tanstack/react-table'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { DataTable } from '@/pages/tasks/components/data-table'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { IconChevronLeft, IconChevronRight, IconCirclePlus, IconRefresh } from '@tabler/icons-react'
+import { Layout } from '@/components/custom/layout'
+import { Search } from '@/components/search'
+import ThemeSwitch from '@/components/theme-switch'
+import { UserNav } from '@/components/user-nav'
+import { Button } from '@/components/custom/button'
+import {
+    Pagination,
+    PaginationContent,
+    PaginationItem,
+    PaginationLink,
+} from "@/components/ui/pagination"
+import { useLocation, useNavigate } from 'react-router-dom'
+import { Skeleton } from "@/components/ui/skeleton"
+import { Badge } from '@/components/ui/badge'
 
 const addUserSchema = z.object({
     email: z.string().email('Invalid email address'),
@@ -38,10 +59,14 @@ type User = {
 }
 
 type UserResponse = {
-    message: string
+    success: boolean
     code: number
-    status: boolean
+    message: string
     data: User[]
+    currentPage: number
+    totalPages: number
+    totalData: number
+    pageSize: number
 }
 
 type Role = {
@@ -261,11 +286,48 @@ function ResetUserButton({ clientId }: { clientId: string | null }) {
     )
 }
 
+function TableSkeleton() {
+    return (
+        <div className="space-y-4">
+            <div className="flex items-center space-x-4">
+                <Skeleton className="h-10 w-[250px]" />
+            </div>
+            <div className="rounded-md border">
+                <div className="h-12 border-b bg-muted" />
+                {[...Array(5)].map((_, i) => (
+                    <div key={i} className="flex items-center space-x-4 p-4">
+                        <Skeleton className="h-6 w-[40px]" />
+                        <Skeleton className="h-6 w-[200px]" />
+                        <Skeleton className="h-6 w-[100px]" />
+                        <Skeleton className="h-6 w-[80px]" />
+                        <Skeleton className="h-6 w-[60px]" />
+                        <Skeleton className="h-6 w-[120px]" />
+                        <Skeleton className="h-6 w-[40px]" />
+                    </div>
+                ))}
+            </div>
+            <div className="flex items-center justify-between">
+                <Skeleton className="h-6 w-[200px]" />
+                <Skeleton className="h-10 w-[300px]" />
+            </div>
+        </div>
+    )
+}
+
 export default function UserManagement() {
+    const location = useLocation()
+    const navigate = useNavigate()
+    const searchParams = new URLSearchParams(location.search)
+    const page = Number(searchParams.get('page')) || 1
+    const pageSize = Number(searchParams.get('pageSize')) || 10
+
     const usersQuery = useQuery<UserResponse>({
-        queryKey: ['users'],
+        queryKey: ['users', page, pageSize],
         queryFn: async () => {
-            const response = await api.get("/users/list-users")
+            const response = await api.post("/users/list-users", {
+                page: page,
+                size: pageSize,
+            })
             return response.data
         },
     })
@@ -311,12 +373,18 @@ export default function UserManagement() {
         {
             accessorKey: 'status',
             header: 'Status',
-            cell: ({ row }) => row.original.status ? 'Active' : 'Inactive',
+            cell: ({ row }) => (
+                <Badge variant={row.original.status ? "default" : "destructive"}>
+                    {row.original.status ? 'Active' : 'Inactive'}
+                </Badge>
+            ),
+            size: 100,
         },
         {
             accessorKey: 'is_verifikasi',
             header: 'Verified',
-            cell: ({ row }) => <VerificationCheckbox user={row.original} />,
+            cell: ({ row }) =>
+                <VerificationCheckbox user={row.original} />,
         },
         {
             accessorKey: 'id_roles',
@@ -369,6 +437,19 @@ export default function UserManagement() {
         },
     ], [rolesQuery.data, updateRoleMutation])
 
+    const table = useReactTable({
+        data: usersQuery.data?.data || [],
+        columns,
+        getCoreRowModel: getCoreRowModel(),
+        manualPagination: true,
+        pageCount: usersQuery.data?.totalPages || -1,
+    })
+
+    const updatePage = (newPage: number) => {
+        searchParams.set('page', newPage.toString())
+        navigate(`${location.pathname}?${searchParams.toString()}`)
+    }
+
     return (
         <Layout>
             <Layout.Header sticky>
@@ -390,19 +471,100 @@ export default function UserManagement() {
                 </div>
                 <div className='-mx-4 flex-1 overflow-auto px-4 py-1 lg:flex-row lg:space-x-12 lg:space-y-0'>
                     {usersQuery.isLoading || rolesQuery.isLoading ? (
-                        <p>Loading...</p>
+                        <TableSkeleton />
                     ) : usersQuery.isError || rolesQuery.isError ? (
                         <p>Error loading data: {((usersQuery.error || rolesQuery.error) as Error).message}</p>
                     ) : (
-                        <DataTable
-                            columns={columns}
-                            data={usersQuery.data?.data || []}
-                            header={
-                                <div className='flex items-center justify-end'>
-                                    <AddUserButton />
+                        <div className="w-full">
+                            <div className="flex items-center py-4">
+                                <AddUserButton />
+                            </div>
+                            <div className="rounded-md border">
+                                <Table>
+                                    <TableHeader>
+                                        {table.getHeaderGroups().map((headerGroup) => (
+                                            <TableRow key={headerGroup.id}>
+                                                {headerGroup.headers.map((header) => (
+                                                    <TableHead key={header.id}>
+                                                        {header.isPlaceholder
+                                                            ? null
+                                                            : flexRender(
+                                                                header.column.columnDef.header,
+                                                                header.getContext()
+                                                            )}
+                                                    </TableHead>
+                                                ))}
+                                            </TableRow>
+                                        ))}
+                                    </TableHeader>
+                                    <TableBody>
+                                        {table.getRowModel().rows?.length ? (
+                                            table.getRowModel().rows.map((row) => (
+                                                <TableRow
+                                                    key={row.id}
+                                                    data-state={row.getIsSelected() && "selected"}
+                                                >
+                                                    {row.getVisibleCells().map((cell) => (
+                                                        <TableCell key={cell.id}>
+                                                            {flexRender(
+                                                                cell.column.columnDef.cell,
+                                                                cell.getContext()
+                                                            )}
+                                                        </TableCell>
+                                                    ))}
+                                                </TableRow>
+                                            ))
+                                        ) : (
+                                            <TableRow>
+                                                <TableCell
+                                                    colSpan={columns.length}
+                                                    className="h-24 text-center"
+                                                >
+                                                    No results.
+                                                </TableCell>
+                                            </TableRow>
+                                        )}
+                                    </TableBody>
+                                </Table>
+                            </div>
+                            <div className="flex items-center justify-between space-x-2 py-4">
+                                <div className="leading-none text-muted-foreground">
+                                    Menampilkan {usersQuery.data?.data.length} dari {usersQuery.data?.totalData} hasil
                                 </div>
-                            }
-                        />
+                                <Pagination className='flex items-center space-x-2'>
+                                    <PaginationContent>
+                                        <PaginationItem>
+                                            <Button
+                                                className='mr-2'
+                                                onClick={() => updatePage(Math.max(page - 1, 1))}
+                                                disabled={page === 1}
+                                            >
+                                                <IconChevronLeft size={16} />
+                                            </Button>
+                                        </PaginationItem>
+                                        {[...Array(usersQuery.data?.totalPages)].map((_, index) => (
+                                            <PaginationItem key={index}>
+                                                <PaginationLink
+                                                    onClick={() => updatePage(index + 1)}
+                                                    isActive={page === index + 1}
+                                                >
+                                                    {index + 1}
+                                                </PaginationLink>
+                                            </PaginationItem>
+                                        ))}
+                                        <PaginationItem>
+                                            <Button
+                                                className='ml-2'
+                                                onClick={() => updatePage(page + 1)}
+                                                disabled={page >= (usersQuery.data?.totalPages || 0)}
+                                            >
+                                                <IconChevronRight size={16} />
+                                            </Button>
+                                        </PaginationItem>
+                                    </PaginationContent>
+                                </Pagination>
+                            </div>
+                        </div>
                     )}
                 </div>
             </Layout.Body>
