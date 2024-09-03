@@ -95,10 +95,10 @@ function NavLink({
       onClick={closeNav}
       className={cn(
         buttonVariants({
-          variant: checkActiveNav(href) ? 'secondary' : 'ghost',
+          variant: checkActiveNav(href) ? 'default' : 'ghost',
           size: 'sm',
         }),
-        'h-12 justify-start text-wrap rounded-none px-6',
+        'h-12 justify-start text-wrap rounded-lg mx-4',
         subLink && 'h-10 w-full border-l border-l-slate-500 px-2'
       )}
       aria-current={checkActiveNav(href) ? 'page' : undefined}
@@ -166,7 +166,7 @@ function NavLinkIcon({ title, icon, label, href }: NavLinkProps) {
           to={href}
           className={cn(
             buttonVariants({
-              variant: checkActiveNav(href) ? 'secondary' : 'ghost',
+              variant: checkActiveNav(href) ? 'default' : 'ghost',
               size: 'icon',
             }),
             'h-12 w-12'
@@ -199,7 +199,7 @@ function NavLinkIconDropdown({ title, icon, label, sub }: NavLinkProps) {
         <TooltipTrigger asChild>
           <DropdownMenuTrigger asChild>
             <Button
-              variant={isChildActive ? 'secondary' : 'ghost'}
+              variant={isChildActive ? 'default' : 'ghost'}
               size='icon'
               className='h-12 w-12'
             >
@@ -227,7 +227,7 @@ function NavLinkIconDropdown({ title, icon, label, sub }: NavLinkProps) {
           <DropdownMenuItem key={`${title}-${href}`} asChild>
             <Link
               to={href}
-              className={`${checkActiveNav(href) ? 'bg-secondary' : ''}`}
+              className={`${checkActiveNav(href) ? 'bg-primary' : ''}`}
             >
               {icon} <span className='ml-2 max-w-52 text-wrap'>{title}</span>
               {label && <span className='ml-auto text-xs'>{label}</span>}
