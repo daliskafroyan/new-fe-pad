@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import api from '@/api';
 import { Layout } from '@/components/custom/layout';
@@ -15,6 +14,7 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { Checkbox } from '@/components/ui/checkbox';
+import { Skeleton } from '@/components/ui/skeleton';
 
 type RBACData = {
     nama_roles: string;
@@ -41,7 +41,30 @@ const DetailRBACPage = () => {
     });
 
     if (rbacQuery.isLoading) {
-        return <div>Loading...</div>;
+        return (
+            <Layout>
+                <Layout.Header sticky>
+                    <Skeleton className="h-9 w-[250px]" />
+                    <div className='ml-auto flex items-center space-x-4'>
+                        <Skeleton className="h-9 w-9 rounded-full" />
+                        <Skeleton className="h-9 w-9 rounded-full" />
+                    </div>
+                </Layout.Header>
+
+                <Layout.Body>
+                    {[1].map((i) => (
+                        <Card key={i} className="w-full mb-8">
+                            <CardHeader>
+                                <Skeleton className="h-8 w-[200px]" />
+                            </CardHeader>
+                            <CardContent>
+                                <Skeleton className="h-[300px] w-full" />
+                            </CardContent>
+                        </Card>
+                    ))}
+                </Layout.Body>
+            </Layout>
+        );
     }
 
     if (rbacQuery.isError) {

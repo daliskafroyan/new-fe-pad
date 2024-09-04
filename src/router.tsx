@@ -63,6 +63,22 @@ const router = createBrowserRouter([
         }),
       },
       {
+        path: 'rbac',
+        errorElement: <GeneralError />,
+        children: [
+          {
+            index: true,
+            element: <Navigate to="/rbac/list-menu" replace />,
+          },
+          {
+            path: 'list-menu',
+            lazy: async () => ({
+              Component: (await import('@/pages/users/list-menu.page')).default,
+            }),
+          },
+        ]
+      },
+      {
         path: 'users',
         errorElement: <GeneralError />,
         children: [
@@ -73,7 +89,7 @@ const router = createBrowserRouter([
           {
             path: 'detail-rbac',
             lazy: async () => ({
-              Component: (await import('@/pages/users/detail-rbac')).default,
+              Component: (await import('@/pages/users/detail-rbac.page')).default,
             }),
           },
           {
