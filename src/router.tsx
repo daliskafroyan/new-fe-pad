@@ -71,6 +71,12 @@ const router = createBrowserRouter([
             element: <Navigate to="/users/list-users" replace />,
           },
           {
+            path: 'detail-rbac',
+            lazy: async () => ({
+              Component: (await import('@/pages/users/detail-rbac')).default,
+            }),
+          },
+          {
             path: 'list-users',
             lazy: async () => ({
               Component: (await import('@/pages/users/user-management')).default,
