@@ -40,6 +40,7 @@ import {
 import { useLocation, useNavigate } from 'react-router-dom'
 import { Skeleton } from "@/components/ui/skeleton"
 import { Badge } from '@/components/ui/badge'
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 const addUserSchema = z.object({
     email: z.string().email('Invalid email address'),
@@ -475,96 +476,98 @@ export default function UserManagement() {
                     ) : usersQuery.isError || rolesQuery.isError ? (
                         <p>Error loading data: {((usersQuery.error || rolesQuery.error) as Error).message}</p>
                     ) : (
-                        <div className="w-full">
-                            <div className="flex items-center py-4">
-                                <AddUserButton />
-                            </div>
-                            <div className="rounded-md border">
-                                <Table>
-                                    <TableHeader>
-                                        {table.getHeaderGroups().map((headerGroup) => (
-                                            <TableRow key={headerGroup.id}>
-                                                {headerGroup.headers.map((header) => (
-                                                    <TableHead key={header.id}>
-                                                        {header.isPlaceholder
-                                                            ? null
-                                                            : flexRender(
-                                                                header.column.columnDef.header,
-                                                                header.getContext()
-                                                            )}
-                                                    </TableHead>
-                                                ))}
-                                            </TableRow>
-                                        ))}
-                                    </TableHeader>
-                                    <TableBody>
-                                        {table.getRowModel().rows?.length ? (
-                                            table.getRowModel().rows.map((row) => (
-                                                <TableRow
-                                                    key={row.id}
-                                                    data-state={row.getIsSelected() && "selected"}
-                                                >
-                                                    {row.getVisibleCells().map((cell) => (
-                                                        <TableCell key={cell.id}>
-                                                            {flexRender(
-                                                                cell.column.columnDef.cell,
-                                                                cell.getContext()
-                                                            )}
-                                                        </TableCell>
+                        <Card className="w-full">
+                            <CardContent>
+                                <div className="flex items-center py-4 justify-end">
+                                    <AddUserButton />
+                                </div>
+                                <div className="rounded-md border">
+                                    <Table>
+                                        <TableHeader>
+                                            {table.getHeaderGroups().map((headerGroup) => (
+                                                <TableRow key={headerGroup.id}>
+                                                    {headerGroup.headers.map((header) => (
+                                                        <TableHead key={header.id}>
+                                                            {header.isPlaceholder
+                                                                ? null
+                                                                : flexRender(
+                                                                    header.column.columnDef.header,
+                                                                    header.getContext()
+                                                                )}
+                                                        </TableHead>
                                                     ))}
                                                 </TableRow>
-                                            ))
-                                        ) : (
-                                            <TableRow>
-                                                <TableCell
-                                                    colSpan={columns.length}
-                                                    className="h-24 text-center"
-                                                >
-                                                    No results.
-                                                </TableCell>
-                                            </TableRow>
-                                        )}
-                                    </TableBody>
-                                </Table>
-                            </div>
-                            <div className="flex items-center justify-between space-x-2 py-4">
-                                <div className="leading-none text-muted-foreground">
-                                    Menampilkan {usersQuery.data?.data.length} dari {usersQuery.data?.totalData} hasil
+                                            ))}
+                                        </TableHeader>
+                                        <TableBody>
+                                            {table.getRowModel().rows?.length ? (
+                                                table.getRowModel().rows.map((row) => (
+                                                    <TableRow
+                                                        key={row.id}
+                                                        data-state={row.getIsSelected() && "selected"}
+                                                    >
+                                                        {row.getVisibleCells().map((cell) => (
+                                                            <TableCell key={cell.id}>
+                                                                {flexRender(
+                                                                    cell.column.columnDef.cell,
+                                                                    cell.getContext()
+                                                                )}
+                                                            </TableCell>
+                                                        ))}
+                                                    </TableRow>
+                                                ))
+                                            ) : (
+                                                <TableRow>
+                                                    <TableCell
+                                                        colSpan={columns.length}
+                                                        className="h-24 text-center"
+                                                    >
+                                                        No results.
+                                                    </TableCell>
+                                                </TableRow>
+                                            )}
+                                        </TableBody>
+                                    </Table>
                                 </div>
-                                <Pagination className='flex items-center space-x-2'>
-                                    <PaginationContent>
-                                        <PaginationItem>
-                                            <Button
-                                                className='mr-2'
-                                                onClick={() => updatePage(Math.max(page - 1, 1))}
-                                                disabled={page === 1}
-                                            >
-                                                <IconChevronLeft size={16} />
-                                            </Button>
-                                        </PaginationItem>
-                                        {[...Array(usersQuery.data?.totalPages)].map((_, index) => (
-                                            <PaginationItem key={index}>
-                                                <PaginationLink
-                                                    onClick={() => updatePage(index + 1)}
-                                                    isActive={page === index + 1}
+                                <div className="flex items-center justify-between space-x-2 py-4">
+                                    <div className="leading-none text-muted-foreground">
+                                        Menampilkan {usersQuery.data?.data.length} dari {usersQuery.data?.totalData} hasil
+                                    </div>
+                                    <Pagination className='flex items-center space-x-2'>
+                                        <PaginationContent>
+                                            <PaginationItem>
+                                                <Button
+                                                    className='mr-2'
+                                                    onClick={() => updatePage(Math.max(page - 1, 1))}
+                                                    disabled={page === 1}
                                                 >
-                                                    {index + 1}
-                                                </PaginationLink>
+                                                    <IconChevronLeft size={16} />
+                                                </Button>
                                             </PaginationItem>
-                                        ))}
-                                        <PaginationItem>
-                                            <Button
-                                                className='ml-2'
-                                                onClick={() => updatePage(page + 1)}
-                                                disabled={page >= (usersQuery.data?.totalPages || 0)}
-                                            >
-                                                <IconChevronRight size={16} />
-                                            </Button>
-                                        </PaginationItem>
-                                    </PaginationContent>
-                                </Pagination>
-                            </div>
-                        </div>
+                                            {[...Array(usersQuery.data?.totalPages)].map((_, index) => (
+                                                <PaginationItem key={index}>
+                                                    <PaginationLink
+                                                        onClick={() => updatePage(index + 1)}
+                                                        isActive={page === index + 1}
+                                                    >
+                                                        {index + 1}
+                                                    </PaginationLink>
+                                                </PaginationItem>
+                                            ))}
+                                            <PaginationItem>
+                                                <Button
+                                                    className='ml-2'
+                                                    onClick={() => updatePage(page + 1)}
+                                                    disabled={page >= (usersQuery.data?.totalPages || 0)}
+                                                >
+                                                    <IconChevronRight size={16} />
+                                                </Button>
+                                            </PaginationItem>
+                                        </PaginationContent>
+                                    </Pagination>
+                                </div>
+                            </CardContent>
+                        </Card>
                     )}
                 </div>
             </Layout.Body>
