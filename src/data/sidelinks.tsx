@@ -24,6 +24,7 @@ import {
   IconUserCog,
   IconLogout,
   IconMenu2,
+  IconLicense,
 } from '@tabler/icons-react'
 
 export interface NavLink {
@@ -60,7 +61,9 @@ const iconsMap: Record<string, JSX.Element> = {
   "Update Password": <IconLock size={18} />,
   "Trucks": <IconTruck size={18} />,
   "Detail RBAC Users": <IconUserShield size={18} />,
-  "List Menu": <IconMenu2 size={18} />
+  "List Menu": <IconMenu2 size={18} />,
+  "List Semua Permission": <IconLicense size={18} />,
+
 };
 
 interface Menu {
