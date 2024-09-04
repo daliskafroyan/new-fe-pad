@@ -77,6 +77,12 @@ const router = createBrowserRouter([
             }),
           },
           {
+            path: 'list-roles-all',
+            lazy: async () => ({
+              Component: (await import('@/pages/users/list-roles.page')).default,
+            }),
+          },
+          {
             path: 'list-permission',
             lazy: async () => ({
               Component: (await import('@/pages/users/list-permission.page')).default,

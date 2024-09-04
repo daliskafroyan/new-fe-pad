@@ -6,6 +6,7 @@ import Nav from './nav'
 import { cn } from '@/lib/utils'
 import { generateSidelinks } from '@/data/sidelinks'
 import { useAuthStore } from '@/store/authStore'
+import { Skeleton } from './ui/skeleton'
 
 interface SidebarProps extends React.HTMLAttributes<HTMLElement> {
   isCollapsed: boolean
@@ -29,7 +30,24 @@ export default function Sidebar({
   }, [navOpened])
 
   if (!userAuthorization) {
-    return <div>Loading...</div>;
+    return (
+      <aside className={cn(
+        `fixed left-0 right-0 top-0 z-50 w-full border-r-2 border-r-muted transition-[width] md:bottom-0 md:right-auto md:h-svh ${isCollapsed ? 'md:w-14' : 'md:w-64'}`,
+        className
+      )}>
+        <Layout fixed>
+          <Layout.Header sticky className='z-50 flex justify-between px-4 py-3 shadow-sm md:px-4'>
+            <Skeleton className="h-8 w-8 rounded" />
+            <Skeleton className="h-8 w-8 rounded-full md:hidden" />
+          </Layout.Header>
+          <div className="p-4">
+            {[...Array(5)].map((_, index) => (
+              <Skeleton key={index} className="h-8 w-full mb-2" />
+            ))}
+          </div>
+        </Layout>
+      </aside>
+    )
   }
 
   const sidelinks = generateSidelinks(userAuthorization)
