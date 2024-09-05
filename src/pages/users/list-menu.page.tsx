@@ -26,6 +26,8 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { IconCirclePlus } from '@tabler/icons-react';
 import { useToast } from "@/components/ui/use-toast";
+import { IconInfoCircle } from '@tabler/icons-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 const addListSchema = z.object({
     namaMenu: z.string().min(1, 'Menu name is required'),
@@ -157,6 +159,7 @@ export type MenuItem = {
     nama_menu: string;
     nama_sub_menu: string | null;
     url: string;
+    is_menu: boolean;
 };
 
 type MenuListResponse = {
@@ -235,6 +238,19 @@ const ListMenuPage = () => {
                                     <TableHead>Menu</TableHead>
                                     <TableHead>Sub Menu</TableHead>
                                     <TableHead>URL</TableHead>
+                                    <TableHead>
+                                        Is Menu
+                                        <TooltipProvider>
+                                            <Tooltip delayDuration={0}>
+                                                <TooltipTrigger>
+                                                    <IconInfoCircle size={16} className="ml-1 inline-block" />
+                                                </TooltipTrigger>
+                                                <TooltipContent className='bg-card text-card-foreground border border-gray-200'>
+                                                    <p>menu ini tidak akan muncul dalam daftar menu jika tercentang</p>
+                                                </TooltipContent>
+                                            </Tooltip>
+                                        </TooltipProvider>
+                                    </TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -244,6 +260,9 @@ const ListMenuPage = () => {
                                         <TableCell>{item.nama_menu}</TableCell>
                                         <TableCell>{item.nama_sub_menu || ''}</TableCell>
                                         <TableCell>{item.url}</TableCell>
+                                        <TableCell>
+                                            <Checkbox checked={item.is_menu} disabled />
+                                        </TableCell>
                                     </TableRow>
                                 ))}
                             </TableBody>
