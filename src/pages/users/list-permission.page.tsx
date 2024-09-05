@@ -22,6 +22,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { cn } from "@/lib/utils"
 import { Check, ChevronsUpDown } from "lucide-react"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
 type PermissionData = {
     nama_roles: string;
@@ -422,71 +423,159 @@ const ListPermissionPage = () => {
             </Layout.Header>
 
             <Layout.Body>
-                {data?.map((roleData, index) => {
-                    const roleId = rolesQuery.data?.list.find(r => r.nama_roles === roleData.nama_roles)?.id;
-                    return (
-                        <Card key={index} className="w-full mb-8">
-                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                <CardTitle>Permissions for {roleData.nama_roles}</CardTitle>
-                                {roleId && <AddPermissionButton roleId={roleId} roleName={roleData.nama_roles} />}
-                            </CardHeader>
-                            <CardContent>
-                                <Table>
-                                    <TableHeader>
-                                        <TableRow>
-                                            <TableHead>Menu</TableHead>
-                                            <TableHead>Sub Menu</TableHead>
-                                            <TableHead>URL</TableHead>
-                                            <TableHead>Create</TableHead>
-                                            <TableHead>Read</TableHead>
-                                            <TableHead>Update</TableHead>
-                                            <TableHead>Delete</TableHead>
-                                        </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                        {roleData.menus.flatMap((menu) =>
-                                            menu.sub_menus.map((subMenu, subIndex) => {
-                                                const roleId = rolesQuery.data?.list.find(r => r.nama_roles === roleData.nama_roles)?.id;
-                                                const menuItem = menuListQuery.data?.list.find(item => item.url === subMenu.url);
-                                                return (
-                                                    <TableRow key={`${menu.nama_menu}-${subMenu.url}-${subIndex}`}>
-                                                        <TableCell>{subIndex === 0 ? menu.nama_menu : ''}</TableCell>
-                                                        <TableCell>{subMenu.nama_sub_menu || ''}</TableCell>
-                                                        <TableCell>{subMenu.url}</TableCell>
-                                                        <TableCell>
-                                                            <Checkbox
-                                                                checked={subMenu.create_permission}
-                                                                onCheckedChange={(checked) => roleId && menuItem && handlePermissionChange(roleId, menuItem.id, 'create', checked as boolean)}
-                                                            />
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            <Checkbox
-                                                                checked={subMenu.read_permission}
-                                                                onCheckedChange={(checked) => roleId && menuItem && handlePermissionChange(roleId, menuItem.id, 'read', checked as boolean)}
-                                                            />
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            <Checkbox
-                                                                checked={subMenu.update_permission}
-                                                                onCheckedChange={(checked) => roleId && menuItem && handlePermissionChange(roleId, menuItem.id, 'update', checked as boolean)}
-                                                            />
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            <Checkbox
-                                                                checked={subMenu.delete_permission}
-                                                                onCheckedChange={(checked) => roleId && menuItem && handlePermissionChange(roleId, menuItem.id, 'delete', checked as boolean)}
-                                                            />
-                                                        </TableCell>
-                                                    </TableRow>
-                                                );
-                                            })
-                                        )}
-                                    </TableBody>
-                                </Table>
-                            </CardContent>
-                        </Card>
-                    );
-                })}
+            <Tabs defaultValue={data?.[0]?.nama_roles}>
+                            <TabsList className="mb-4">
+                                {data?.map((roleData) => (
+                                    <TabsTrigger key={roleData.nama_roles} value={roleData.nama_roles}>
+                                        {roleData.nama_roles}
+                                    </TabsTrigger>
+                                ))}
+                            </TabsList>
+                            <Card className="w-full pt-4">
+                                <CardContent>
+                            {data?.map((roleData) => {
+                                const roleId = rolesQuery.data?.list.find(r => r.nama_roles === roleData.nama_roles)?.id;
+                                return (
+                                    <TabsContent key={roleData.nama_roles} value={roleData.nama_roles}>
+                                        <div className="flex justify-between items-center mb-4">
+                                            <h3 className="text-lg font-semibold">Permissions for {roleData.nama_roles}</h3>
+                                            {roleId && <AddPermissionButton roleId={roleId} roleName={roleData.nama_roles} />}
+                                        </div>
+                                        <Table>
+                                            <TableHeader>
+                                                <TableRow>
+                                                    <TableHead>Menu</TableHead>
+                                                    <TableHead>Sub Menu</TableHead>
+                                                    <TableHead>URL</TableHead>
+                                                    <TableHead>Create</TableHead>
+                                                    <TableHead>Read</TableHead>
+                                                    <TableHead>Update</TableHead>
+                                                    <TableHead>Delete</TableHead>
+                                                </TableRow>
+                                            </TableHeader>
+                                            <TableBody>
+                                                {roleData.menus.flatMap((menu) =>
+                                                    menu.sub_menus.map((subMenu, subIndex) => {
+                                                        const menuItem = menuListQuery.data?.list.find(item => item.url === subMenu.url);
+                                                        return (
+                                                            <TableRow key={`${menu.nama_menu}-${subMenu.url}-${subIndex}`}>
+                                                                <TableCell>{subIndex === 0 ? menu.nama_menu : ''}</TableCell>
+                                                                <TableCell>{subMenu.nama_sub_menu || ''}</TableCell>
+                                                                <TableCell>{subMenu.url}</TableCell>
+                                                                <TableCell>
+                                                                    <Checkbox
+                                                                        checked={subMenu.create_permission}
+                                                                        onCheckedChange={(checked) => roleId && menuItem && handlePermissionChange(roleId, menuItem.id, 'create', checked as boolean)}
+                                                                    />
+                                                                </TableCell>
+                                                                <TableCell>
+                                                                    <Checkbox
+                                                                        checked={subMenu.read_permission}
+                                                                        onCheckedChange={(checked) => roleId && menuItem && handlePermissionChange(roleId, menuItem.id, 'read', checked as boolean)}
+                                                                    />
+                                                                </TableCell>
+                                                                <TableCell>
+                                                                    <Checkbox
+                                                                        checked={subMenu.update_permission}
+                                                                        onCheckedChange={(checked) => roleId && menuItem && handlePermissionChange(roleId, menuItem.id, 'update', checked as boolean)}
+                                                                    />
+                                                                </TableCell>
+                                                                <TableCell>
+                                                                    <Checkbox
+                                                                        checked={subMenu.delete_permission}
+                                                                        onCheckedChange={(checked) => roleId && menuItem && handlePermissionChange(roleId, menuItem.id, 'delete', checked as boolean)}
+                                                                    />
+                                                                </TableCell>
+                                                            </TableRow>
+                                                        );
+                                                    })
+                                                )}
+                                            </TableBody>
+                                        </Table>
+                                    </TabsContent>
+                                    );
+                                })}
+                                </CardContent>
+                                </Card>
+                        </Tabs>
+                {/* <Card className="w-full">
+                    <CardHeader>
+                        <CardTitle>Role Permissions</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <Tabs defaultValue={data?.[0]?.nama_roles}>
+                            <TabsList className="mb-4">
+                                {data?.map((roleData) => (
+                                    <TabsTrigger key={roleData.nama_roles} value={roleData.nama_roles}>
+                                        {roleData.nama_roles}
+                                    </TabsTrigger>
+                                ))}
+                            </TabsList>
+                            {data?.map((roleData) => {
+                                const roleId = rolesQuery.data?.list.find(r => r.nama_roles === roleData.nama_roles)?.id;
+                                return (
+                                    <TabsContent key={roleData.nama_roles} value={roleData.nama_roles}>
+                                        <div className="flex justify-between items-center mb-4">
+                                            <h3 className="text-lg font-semibold">Permissions for {roleData.nama_roles}</h3>
+                                            {roleId && <AddPermissionButton roleId={roleId} roleName={roleData.nama_roles} />}
+                                        </div>
+                                        <Table>
+                                            <TableHeader>
+                                                <TableRow>
+                                                    <TableHead>Menu</TableHead>
+                                                    <TableHead>Sub Menu</TableHead>
+                                                    <TableHead>URL</TableHead>
+                                                    <TableHead>Create</TableHead>
+                                                    <TableHead>Read</TableHead>
+                                                    <TableHead>Update</TableHead>
+                                                    <TableHead>Delete</TableHead>
+                                                </TableRow>
+                                            </TableHeader>
+                                            <TableBody>
+                                                {roleData.menus.flatMap((menu) =>
+                                                    menu.sub_menus.map((subMenu, subIndex) => {
+                                                        const menuItem = menuListQuery.data?.list.find(item => item.url === subMenu.url);
+                                                        return (
+                                                            <TableRow key={`${menu.nama_menu}-${subMenu.url}-${subIndex}`}>
+                                                                <TableCell>{subIndex === 0 ? menu.nama_menu : ''}</TableCell>
+                                                                <TableCell>{subMenu.nama_sub_menu || ''}</TableCell>
+                                                                <TableCell>{subMenu.url}</TableCell>
+                                                                <TableCell>
+                                                                    <Checkbox
+                                                                        checked={subMenu.create_permission}
+                                                                        onCheckedChange={(checked) => roleId && menuItem && handlePermissionChange(roleId, menuItem.id, 'create', checked as boolean)}
+                                                                    />
+                                                                </TableCell>
+                                                                <TableCell>
+                                                                    <Checkbox
+                                                                        checked={subMenu.read_permission}
+                                                                        onCheckedChange={(checked) => roleId && menuItem && handlePermissionChange(roleId, menuItem.id, 'read', checked as boolean)}
+                                                                    />
+                                                                </TableCell>
+                                                                <TableCell>
+                                                                    <Checkbox
+                                                                        checked={subMenu.update_permission}
+                                                                        onCheckedChange={(checked) => roleId && menuItem && handlePermissionChange(roleId, menuItem.id, 'update', checked as boolean)}
+                                                                    />
+                                                                </TableCell>
+                                                                <TableCell>
+                                                                    <Checkbox
+                                                                        checked={subMenu.delete_permission}
+                                                                        onCheckedChange={(checked) => roleId && menuItem && handlePermissionChange(roleId, menuItem.id, 'delete', checked as boolean)}
+                                                                    />
+                                                                </TableCell>
+                                                            </TableRow>
+                                                        );
+                                                    })
+                                                )}
+                                            </TableBody>
+                                        </Table>
+                                    </TabsContent>
+                                );
+                            })}
+                        </Tabs>
+                    </CardContent>
+                </Card> */}
             </Layout.Body>
         </Layout>
     );
