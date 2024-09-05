@@ -123,7 +123,7 @@ const ListRolesPage = () => {
 
     const updateRoleStatusMutation = useMutation({
         mutationFn: async ({ uuid, status }: { uuid: string; status: boolean }) => {
-            const response = await api.post("/rbac/update-roles", { uuid, status });
+            const response = await api.put("/rbac/update-roles", { uuid, status });
             return response.data;
         },
         onSuccess: () => {

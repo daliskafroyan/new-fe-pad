@@ -336,7 +336,7 @@ const ListPermissionPage = () => {
 
     const updatePermissionMutation = useMutation({
         mutationFn: async (payload: UpdatePermissionPayload) => {
-            const response = await api.post("/rbac/update-permission", payload);
+            const response = await api.put("/rbac/update-permission", payload);
             return response.data;
         },
         onSuccess: () => {
