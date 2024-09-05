@@ -40,7 +40,7 @@ import {
 import { useLocation, useNavigate } from 'react-router-dom'
 import { Skeleton } from "@/components/ui/skeleton"
 import { Badge } from '@/components/ui/badge'
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 
 const addUserSchema = z.object({
     email: z.string().email('Invalid email address'),
