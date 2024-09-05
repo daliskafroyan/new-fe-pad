@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '@/api';
 import { Layout } from '@/components/custom/layout';
@@ -16,6 +17,12 @@ import {
 import { Checkbox } from '@/components/ui/checkbox';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from "@/components/ui/use-toast";
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Form, FormField, FormItem, FormLabel, FormControl } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { IconCirclePlus } from '@tabler/icons-react';
+import { useForm } from 'react-hook-form';
 
 type RoleData = {
     id: number;
@@ -23,6 +30,85 @@ type RoleData = {
     nama_roles: string;
     status: boolean;
 };
+
+function CreateRoleButton() {
+    const [open, setOpen] = useState(false);
+    const queryClient = useQueryClient();
+    const form = useForm({
+        defaultValues: {
+            roleName: '',
+        },
+    });
+
+    const createRoleMutation = useMutation({
+        mutationFn: async (namaRoles: string) => {
+            const response = await api.post("/rbac/create-roles", { namaRoles });
+            return response.data;
+        },
+        onSuccess: () => {
+            toast({
+                title: "Success",
+                description: "New role created successfully",
+            });
+            setOpen(false);
+            form.reset();
+            queryClient.invalidateQueries({ queryKey: ['list-roles'] });
+        },
+        onError: () => {
+            toast({
+                title: "Error",
+                description: "Failed to create new role",
+                variant: "destructive",
+            });
+        },
+    });
+
+    const onSubmit = form.handleSubmit((data) => {
+        if (data.roleName.trim()) {
+            createRoleMutation.mutate(data.roleName.trim());
+        }
+    });
+
+    return (
+        <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+                <Button size="sm">
+                    <IconCirclePlus size={16} className="mr-2" />
+                    Buat Role Baru
+                </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                    <DialogTitle>Buat Role Baru</DialogTitle>
+                </DialogHeader>
+                <Form {...form}>
+                    <form onSubmit={onSubmit} className="space-y-4">
+                        <FormField
+                            control={form.control}
+                            name="roleName"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Nama Role</FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            {...field}
+                                            placeholder="Masukkan nama role"
+                                        />
+                                    </FormControl>
+                                </FormItem>
+                            )}
+                        />
+                        <div className="flex justify-end">
+                            <Button type="submit" disabled={createRoleMutation.isPending}>
+                                {createRoleMutation.isPending ? 'Membuat...' : 'Buat Role'}
+                            </Button>
+                        </div>
+                    </form>
+                </Form>
+            </DialogContent>
+        </Dialog>
+    );
+}
 
 const ListRolesPage = () => {
     const queryClient = useQueryClient();
@@ -103,8 +189,9 @@ const ListRolesPage = () => {
 
             <Layout.Body>
                 <Card className="w-full">
-                    <CardHeader>
-                        <CardTitle>List of Roles</CardTitle>
+                    <CardHeader className='flex justify-between flex-row items-center'>
+                        <CardTitle>List Roles</CardTitle>
+                    <CreateRoleButton />
                     </CardHeader>
                     <CardContent>
                         <Table>
