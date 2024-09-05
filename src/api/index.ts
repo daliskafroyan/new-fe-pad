@@ -25,6 +25,11 @@ api.interceptors.response.use(
         return response;
     },
     (error: AxiosError<{ message: string }>) => {
+        // if (error.response?.data.message === 'Token expired') {
+        //     const { clearAuth } = useAuthStore.getState();
+        //     clearAuth();
+        //     window.location.href = '/sign-in';
+        // }
         throw new Error(error.response?.data.message);
     },
 );

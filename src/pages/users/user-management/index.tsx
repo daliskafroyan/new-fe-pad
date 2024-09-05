@@ -116,12 +116,12 @@ function AddUserButton() {
             <DialogTrigger asChild>
                 <Button className="flex items-center space-x-2">
                     <IconCirclePlus size={20} />
-                    <span>Add New User</span>
+                    <span>Tambah User Baru</span>
                 </Button>
             </DialogTrigger>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>Add New User</DialogTitle>
+                    <DialogTitle>Tambah User Baru</DialogTitle>
                 </DialogHeader>
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">

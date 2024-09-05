@@ -18,7 +18,11 @@ function createQueryClient() {
         },
         queryCache: new QueryCache({
             onError: (error) => {
-                if (error.message === "Unauthenticated." || error.message === "Authentication failed" || error.message === "Invalid authentication") {
+                if (error.message === "Unauthenticated." 
+                    || error.message === "Authentication failed" 
+                    || error.message === "Invalid authentication"
+                    || error.message === "Token expired"
+                ) {
                     const clearAuth = useAuthStore.getState().clearAuth;
                     clearAuth();
                     logout()

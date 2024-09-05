@@ -15,8 +15,144 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { Skeleton } from '@/components/ui/skeleton';
+import { z } from 'zod';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { IconCirclePlus } from '@tabler/icons-react';
+import { useToast } from "@/components/ui/use-toast";
 
-type MenuItem = {
+const addListSchema = z.object({
+    namaMenu: z.string().min(1, 'Menu name is required'),
+    namaSubMenu: z.string().optional(),
+    url: z.string().min(1, 'URL is required'),
+    isMenu: z.boolean(),
+});
+
+type AddListFormValues = z.infer<typeof addListSchema>;
+
+function AddListButton() {
+    const [open, setOpen] = useState(false);
+    const { toast } = useToast();
+    const queryClient = useQueryClient();
+    const form = useForm<AddListFormValues>({
+        resolver: zodResolver(addListSchema),
+        defaultValues: { namaMenu: '', namaSubMenu: '', url: '', isMenu: false },
+    });
+
+    const addListMutation = useMutation({
+        mutationFn: async (data: AddListFormValues) => {
+            const response = await api.post("/rbac/create-menu", data);
+            return response.data;
+        },
+        onSuccess: () => {
+            toast({
+                title: "Success",
+                description: "Menu item added successfully",
+            });
+            form.reset();
+            setOpen(false);
+            queryClient.invalidateQueries({ queryKey: ['menu-list'] });
+        },
+    });
+
+    const onSubmit = (values: AddListFormValues) => {
+        addListMutation.mutate(values);
+    };
+
+    return (
+        <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+                <Button className="flex items-center space-x-2">
+                    <IconCirclePlus size={20} />
+                    <span>Tambah Menu Baru</span>
+                </Button>
+            </DialogTrigger>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Tambah Menu Baru</DialogTitle>
+                </DialogHeader>
+                <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                        <FormField
+                            control={form.control}
+                            name="namaMenu"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Nama Menu <span className="text-red-500">*</span></FormLabel>
+                                    <FormControl>
+                                        <Input placeholder="Nama menu" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="namaSubMenu"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Nama Sub Menu</FormLabel>
+                                    <FormControl>
+                                        <Input  placeholder="Nama sub menu" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="url"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>URL<span className="text-red-500">*</span></FormLabel>
+                                    <FormControl>
+                                        <Input placeholder="/url-menu-baru" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="isMenu"
+                            render={({ field }) => (
+                                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                                    <FormControl>
+                                        <Checkbox
+                                            checked={field.value}
+                                            onCheckedChange={field.onChange}
+                                        />
+                                    </FormControl>
+                                    <div className="space-y-1 leading-none">
+                                        <FormLabel>
+                                            Is Menu
+                                        </FormLabel>
+                                        <FormDescription>
+                                            Jika dicentang, menu ini tidak akan muncul dalam daftar menu.
+                                        </FormDescription>
+                                    </div>
+                                </FormItem>
+                            )}
+                        />
+                        <div className="flex justify-end">
+                            <Button type="submit" disabled={addListMutation.isPending}>
+                                {addListMutation.isPending ? 'Menambahkan...' : 'Tambah Menu'}
+                            </Button>
+                        </div>
+                    </form>
+                </Form>
+            </DialogContent>
+        </Dialog>
+    );
+}
+
+export type MenuItem = {
     id: number;
     nama_menu: string;
     nama_sub_menu: string | null;
@@ -87,12 +223,13 @@ const ListMenuPage = () => {
 
             <Layout.Body>
                 <Card className="w-full mb-8">
-                    <CardHeader>
-                        <CardTitle>List Menu</CardTitle>
-                    </CardHeader>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle>List Menu</CardTitle>
+                    <AddListButton />
+                </CardHeader>
                     <CardContent>
                         <Table>
-                            <TableHeader>
+                        <TableHeader>
                                 <TableRow>
                                     <TableHead>ID</TableHead>
                                     <TableHead>Menu</TableHead>
