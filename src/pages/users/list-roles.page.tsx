@@ -24,7 +24,7 @@ import { Input } from '@/components/ui/input';
 import { IconCirclePlus } from '@tabler/icons-react';
 import { useForm } from 'react-hook-form';
 
-type RoleData = {
+export type RoleData = {
     id: number;
     uuid: string;
     nama_roles: string;
@@ -191,7 +191,7 @@ const ListRolesPage = () => {
                 <Card className="w-full">
                     <CardHeader className='flex justify-between flex-row items-center'>
                         <CardTitle>List Roles</CardTitle>
-                    <CreateRoleButton />
+                        <CreateRoleButton />
                     </CardHeader>
                     <CardContent>
                         <Table>

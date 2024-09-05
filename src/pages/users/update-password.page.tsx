@@ -11,16 +11,70 @@ import { UserNav } from '@/components/user-nav';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 
-const UpdatePasswordPage = () => {
+interface UpdatePasswordCardProps {
+    onSubmit: (oldPassword: string, newPassword: string, confirmPassword: string) => Promise<void>;
+}
+
+export const UpdatePasswordCard: React.FC<UpdatePasswordCardProps> = ({ onSubmit }) => {
     const [oldPassword, setOldPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
-    const navigate = useNavigate();
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        onSubmit(oldPassword, newPassword, confirmPassword);
+    };
+
+    return (
+        <Card className="max-w-md">
+            <CardHeader>
+                <CardTitle>Update Password</CardTitle>
+            </CardHeader>
+            <CardContent>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="oldPassword">Password Lama</Label>
+                        <Input
+                            id="oldPassword"
+                            type="password"
+                            value={oldPassword}
+                            onChange={(e) => setOldPassword(e.target.value)}
+                            required
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="newPassword">Password Baru</Label>
+                        <Input
+                            id="newPassword"
+                            type="password"
+                            value={newPassword}
+                            onChange={(e) => setNewPassword(e.target.value)}
+                            required
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="confirmPassword">Konfirmasi Password Baru</Label>
+                        <Input
+                            id="confirmPassword"
+                            type="password"
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            required
+                        />
+                    </div>
+                    <div className='flex justify-end'>
+                        <Button type="submit" className='mt-4'>Update Password</Button>
+                    </div>
+                </form>
+            </CardContent>
+        </Card>
+    );
+};
+
+const UpdatePasswordPage = () => {
     const { toast } = useToast();
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-
+    const handlePasswordUpdate = async (oldPassword: string, newPassword: string, confirmPassword: string) => {
         if (newPassword !== confirmPassword) {
             toast({
                 title: 'Error',
@@ -41,7 +95,6 @@ const UpdatePasswordPage = () => {
                 title: 'Success',
                 description: 'Password updated successfully',
             });
-            navigate('/dashboard');
         } catch (error) {
             toast({
                 title: 'Error',
@@ -62,48 +115,7 @@ const UpdatePasswordPage = () => {
             </Layout.Header>
 
             <Layout.Body>
-                <Card className="max-w-md">
-                    <CardHeader>
-                        <CardTitle>Update Password</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <form onSubmit={handleSubmit} className="space-y-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="oldPassword">Password Lama</Label>
-                                <Input
-                                    id="oldPassword"
-                                    type="password"
-                                    value={oldPassword}
-                                    onChange={(e) => setOldPassword(e.target.value)}
-                                    required
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="newPassword">Password Baru</Label>
-                                <Input
-                                    id="newPassword"
-                                    type="password"
-                                    value={newPassword}
-                                    onChange={(e) => setNewPassword(e.target.value)}
-                                    required
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="confirmPassword">Konfirmasi Password Baru</Label>
-                                <Input
-                                    id="confirmPassword"
-                                    type="password"
-                                    value={confirmPassword}
-                                    onChange={(e) => setConfirmPassword(e.target.value)}
-                                    required
-                                />
-                            </div>
-                            <div className='flex justify-end'>
-                                <Button type="submit" className='mt-4'>Update Password</Button>
-                            </div>
-                        </form>
-                    </CardContent>
-                </Card>
+                <UpdatePasswordCard onSubmit={handlePasswordUpdate} />
             </Layout.Body>
         </Layout>
     );
