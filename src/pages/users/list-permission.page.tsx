@@ -66,21 +66,21 @@ type MenuListResponse = {
 };
 
 type UpdatePermissionPayload = {
-  idMenu: number;
-  idRoles: number;
-  createPermission: boolean;
-  readPermission: boolean;
-  updatePermission: boolean;
-  deletePermission: boolean;
+    idMenu: number;
+    idRoles: number;
+    createPermission: boolean;
+    readPermission: boolean;
+    updatePermission: boolean;
+    deletePermission: boolean;
 };
 
 const addPermissionSchema = z.object({
-  idMenu: z.number().min(1, 'Menu is required'),
-  idRoles: z.number().min(1, 'Role is required'),
-  createPermission: z.boolean(),
-  readPermission: z.boolean(),
-  updatePermission: z.boolean(),
-  deletePermission: z.boolean(),
+    idMenu: z.number().min(1, 'Menu is required'),
+    idRoles: z.number().min(1, 'Role is required'),
+    createPermission: z.boolean(),
+    readPermission: z.boolean(),
+    updatePermission: z.boolean(),
+    deletePermission: z.boolean(),
 });
 
 type AddPermissionFormValues = z.infer<typeof addPermissionSchema>;
@@ -92,13 +92,13 @@ function AddPermissionButton({ roleId, roleName }: { roleId: number, roleName: s
     const queryClient = useQueryClient();
     const form = useForm<AddPermissionFormValues>({
         resolver: zodResolver(addPermissionSchema),
-        defaultValues: { 
-            idMenu: 0, 
-            idRoles: roleId, 
-            createPermission: false, 
-            readPermission: false, 
-            updatePermission: false, 
-            deletePermission: false 
+        defaultValues: {
+            idMenu: 0,
+            idRoles: roleId,
+            createPermission: false,
+            readPermission: false,
+            updatePermission: false,
+            deletePermission: false
         },
     });
 
@@ -172,7 +172,7 @@ function AddPermissionButton({ roleId, roleName }: { roleId: number, roleName: s
                                                     {field.value
                                                         ? menuListQuery.data?.list.find(
                                                             (menu) => menu.id === field.value
-                                                          )?.url
+                                                        )?.url
                                                         : "Select menu"}
                                                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                                                 </Button>
@@ -182,8 +182,8 @@ function AddPermissionButton({ roleId, roleName }: { roleId: number, roleName: s
                                             <Command className="max-h-[300px] overflow-hidden">
                                                 <CommandInput placeholder="Search menu..." />
                                                 <CommandEmpty>No menu found.</CommandEmpty>
-                                                    <CommandGroup>
-                                                <ScrollArea className="h-[200px] overflow-auto">
+                                                <CommandGroup>
+                                                    <ScrollArea className="h-[200px] overflow-auto">
                                                         {menuListQuery.data?.list.map((menu) => (
                                                             <CommandItem
                                                                 key={menu.id}
@@ -209,8 +209,8 @@ function AddPermissionButton({ roleId, roleName }: { roleId: number, roleName: s
                                                                 </div>
                                                             </CommandItem>
                                                         ))}
-                                                </ScrollArea>
-                                                    </CommandGroup>
+                                                    </ScrollArea>
+                                                </CommandGroup>
                                             </Command>
                                         </PopoverContent>
                                     </Popover>
@@ -363,9 +363,9 @@ const ListPermissionPage = () => {
     ) => {
         const currentPermissions = permissionQuery.data?.find(
             role => role.nama_roles === rolesQuery.data?.list.find(r => r.id === roleId)?.nama_roles
-        )?.menus.find(menu => menu.sub_menus.some(sub => 
+        )?.menus.find(menu => menu.sub_menus.some(sub =>
             menuListQuery.data?.list.find(item => item.url === sub.url)?.id === menuId
-        ))?.sub_menus.find(sub => 
+        ))?.sub_menus.find(sub =>
             menuListQuery.data?.list.find(item => item.url === sub.url)?.id === menuId
         );
 
@@ -410,7 +410,7 @@ const ListPermissionPage = () => {
         return <div>Error loading data</div>;
     }
 
-    const data = permissionQuery.data;
+    const roles = rolesQuery.data?.list || [];
 
     return (
         <Layout>
@@ -423,81 +423,80 @@ const ListPermissionPage = () => {
             </Layout.Header>
 
             <Layout.Body>
-            <Tabs defaultValue={data?.[0]?.nama_roles}>
-                            <TabsList className="mb-4">
-                                {data?.map((roleData) => (
-                                    <TabsTrigger key={roleData.nama_roles} value={roleData.nama_roles}>
-                                        {roleData.nama_roles}
-                                    </TabsTrigger>
-                                ))}
-                            </TabsList>
-                            <Card className="w-full pt-4">
-                                <CardContent>
-                            {data?.map((roleData) => {
-                                const roleId = rolesQuery.data?.list.find(r => r.nama_roles === roleData.nama_roles)?.id;
-                                return (
-                                    <TabsContent key={roleData.nama_roles} value={roleData.nama_roles}>
-                                        <div className="flex justify-between items-center mb-4">
-                                            <h3 className="text-lg font-semibold">Permissions for {roleData.nama_roles}</h3>
-                                            {roleId && <AddPermissionButton roleId={roleId} roleName={roleData.nama_roles} />}
-                                        </div>
-                                        <Table>
-                                            <TableHeader>
-                                                <TableRow>
-                                                    <TableHead>Menu</TableHead>
-                                                    <TableHead>Sub Menu</TableHead>
-                                                    <TableHead>URL</TableHead>
-                                                    <TableHead>Create</TableHead>
-                                                    <TableHead>Read</TableHead>
-                                                    <TableHead>Update</TableHead>
-                                                    <TableHead>Delete</TableHead>
-                                                </TableRow>
-                                            </TableHeader>
-                                            <TableBody>
-                                                {roleData.menus.flatMap((menu) =>
-                                                    menu.sub_menus.map((subMenu, subIndex) => {
-                                                        const menuItem = menuListQuery.data?.list.find(item => item.url === subMenu.url);
-                                                        return (
-                                                            <TableRow key={`${menu.nama_menu}-${subMenu.url}-${subIndex}`}>
-                                                                <TableCell>{subIndex === 0 ? menu.nama_menu : ''}</TableCell>
-                                                                <TableCell>{subMenu.nama_sub_menu || ''}</TableCell>
-                                                                <TableCell>{subMenu.url}</TableCell>
-                                                                <TableCell>
-                                                                    <Checkbox
-                                                                        checked={subMenu.create_permission}
-                                                                        onCheckedChange={(checked) => roleId && menuItem && handlePermissionChange(roleId, menuItem.id, 'create', checked as boolean)}
-                                                                    />
-                                                                </TableCell>
-                                                                <TableCell>
-                                                                    <Checkbox
-                                                                        checked={subMenu.read_permission}
-                                                                        onCheckedChange={(checked) => roleId && menuItem && handlePermissionChange(roleId, menuItem.id, 'read', checked as boolean)}
-                                                                    />
-                                                                </TableCell>
-                                                                <TableCell>
-                                                                    <Checkbox
-                                                                        checked={subMenu.update_permission}
-                                                                        onCheckedChange={(checked) => roleId && menuItem && handlePermissionChange(roleId, menuItem.id, 'update', checked as boolean)}
-                                                                    />
-                                                                </TableCell>
-                                                                <TableCell>
-                                                                    <Checkbox
-                                                                        checked={subMenu.delete_permission}
-                                                                        onCheckedChange={(checked) => roleId && menuItem && handlePermissionChange(roleId, menuItem.id, 'delete', checked as boolean)}
-                                                                    />
-                                                                </TableCell>
-                                                            </TableRow>
-                                                        );
-                                                    })
-                                                )}
-                                            </TableBody>
-                                        </Table>
-                                    </TabsContent>
-                                    );
-                                })}
-                                </CardContent>
-                                </Card>
-                        </Tabs>
+                <Tabs defaultValue={roles[0]?.nama_roles}>
+                    <TabsList className="mb-4">
+                        {roles.map((role) => (
+                            <TabsTrigger key={role.id} value={role.nama_roles}>
+                                {role.nama_roles}
+                            </TabsTrigger>
+                        ))}
+                    </TabsList>
+                    <Card className="w-full pt-4">
+                        <CardContent>
+                            {roles.map((role) => (
+                                <TabsContent key={role.id} value={role.nama_roles}>
+                                    <div className="flex justify-between items-center mb-4">
+                                        <h3 className="text-lg font-semibold">Permissions for {role.nama_roles}</h3>
+                                        <AddPermissionButton roleId={role.id} roleName={role.nama_roles} />
+                                    </div>
+                                    <Table>
+                                        <TableHeader>
+                                            <TableRow>
+                                                <TableHead>Menu</TableHead>
+                                                <TableHead>Sub Menu</TableHead>
+                                                <TableHead>URL</TableHead>
+                                                <TableHead>Create</TableHead>
+                                                <TableHead>Read</TableHead>
+                                                <TableHead>Update</TableHead>
+                                                <TableHead>Delete</TableHead>
+                                            </TableRow>
+                                        </TableHeader>
+                                        <TableBody>
+                                            {permissionQuery.data?.find(
+                                                roleData => roleData.nama_roles === role.nama_roles
+                                            )?.menus.flatMap((menu) =>
+                                                menu.sub_menus.map((subMenu, subIndex) => {
+                                                    const menuItem = menuListQuery.data?.list.find(item => item.url === subMenu.url);
+                                                    return (
+                                                        <TableRow key={`${menu.nama_menu}-${subMenu.url}-${subIndex}`}>
+                                                            <TableCell>{subIndex === 0 ? menu.nama_menu : ''}</TableCell>
+                                                            <TableCell>{subMenu.nama_sub_menu || ''}</TableCell>
+                                                            <TableCell>{subMenu.url}</TableCell>
+                                                            <TableCell>
+                                                                <Checkbox
+                                                                    checked={subMenu.create_permission}
+                                                                    onCheckedChange={(checked) => role.id && menuItem && handlePermissionChange(role.id, menuItem.id, 'create', checked as boolean)}
+                                                                />
+                                                            </TableCell>
+                                                            <TableCell>
+                                                                <Checkbox
+                                                                    checked={subMenu.read_permission}
+                                                                    onCheckedChange={(checked) => role.id && menuItem && handlePermissionChange(role.id, menuItem.id, 'read', checked as boolean)}
+                                                                />
+                                                            </TableCell>
+                                                            <TableCell>
+                                                                <Checkbox
+                                                                    checked={subMenu.update_permission}
+                                                                    onCheckedChange={(checked) => role.id && menuItem && handlePermissionChange(role.id, menuItem.id, 'update', checked as boolean)}
+                                                                />
+                                                            </TableCell>
+                                                            <TableCell>
+                                                                <Checkbox
+                                                                    checked={subMenu.delete_permission}
+                                                                    onCheckedChange={(checked) => role.id && menuItem && handlePermissionChange(role.id, menuItem.id, 'delete', checked as boolean)}
+                                                                />
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    );
+                                                })
+                                            )}
+                                        </TableBody>
+                                    </Table>
+                                </TabsContent>
+                            ))}
+                        </CardContent>
+                    </Card>
+                </Tabs>
             </Layout.Body>
         </Layout>
     );
