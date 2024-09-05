@@ -5,7 +5,7 @@ import { Layout } from '@/components/custom/layout';
 import { Search } from '@/components/search';
 import ThemeSwitch from '@/components/theme-switch';
 import { UserNav } from '@/components/user-nav';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Checkbox } from '@/components/ui/checkbox';
 import { Skeleton } from '@/components/ui/skeleton';
