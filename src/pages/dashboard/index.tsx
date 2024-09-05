@@ -91,8 +91,8 @@ export default function Dashboard() {
         >
           <div className='w-full overflow-x-auto pb-2'>
             <TabsList>
-              <TabsTrigger value='jumlah-daerah'>Jumlah Daerah</TabsTrigger>
-              <TabsTrigger value='data-realisasi-tahunan'>Data Realisasi Tahunan</TabsTrigger>
+              <TabsTrigger value='jumlah-daerah'>Gambaran Umum</TabsTrigger>
+              <TabsTrigger value='data-realisasi-tahunan'>Detail Rincian Data</TabsTrigger>
             </TabsList>
           </div>
           <TabsContent value='jumlah-daerah' className='space-y-4'>
