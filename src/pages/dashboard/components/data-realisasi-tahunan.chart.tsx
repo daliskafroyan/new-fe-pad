@@ -149,7 +149,7 @@ export function DataRealisasiTahunanChart({ data, isLoading }: DataRealisasiTahu
     }
 
     const years = [...new Set(data.map(item => item.tahun))];
-    const selectedData = data.filter(item => item.tahun === selectedYear);
+    const selectedData = data.filter(item => item.tahun === selectedYear).filter(item => item.kode_akun !== '4.1');
 
     return (
         <div className="space-y-4">

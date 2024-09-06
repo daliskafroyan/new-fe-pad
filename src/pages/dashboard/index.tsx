@@ -3,12 +3,12 @@ import { Search } from '@/components/search'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import ThemeSwitch from '@/components/theme-switch'
 import { UserNav } from '@/components/user-nav'
-import { JumlahDaerahChart } from './components/jumlah-daerah.chart'
 import { useQuery } from '@tanstack/react-query'
 import api from '@/api'
 import { DataRealisasiTahunanChart } from './components/data-realisasi-tahunan.chart'
+import { CombinedCharts } from './components/new-jumlah-daerah.chart'
 
-type JumlahDaerahItem = {
+export type JumlahDaerahItem = {
   jumlah_daerah: number
   jumlah_daerah_belum_realisasi: number
   jumlah_daerah_belum_target: number
@@ -28,7 +28,7 @@ type JumlahDaerahResponse = {
   status_code: number
 }
 
-type DataRealisasiItem = {
+export type DataRealisasiItem = {
   kode_akun: string
   nama_akun: string
   persentase_realisasi: number
@@ -86,19 +86,23 @@ export default function Dashboard() {
         </div>
         <Tabs
           orientation='vertical'
-          defaultValue='jumlah-daerah'
+          defaultValue='gambaran-umum'
           className='space-y-4'
         >
           <div className='w-full overflow-x-auto pb-2'>
             <TabsList>
-              <TabsTrigger value='jumlah-daerah'>Jumlah Daerah</TabsTrigger>
-              <TabsTrigger value='data-realisasi-tahunan'>Data Realisasi Tahunan</TabsTrigger>
+              <TabsTrigger value='gambaran-umum'>Gambaran Umum</TabsTrigger>
+              <TabsTrigger value='detail-rincian-data'>Detail Rincian Data</TabsTrigger>
             </TabsList>
           </div>
-          <TabsContent value='jumlah-daerah' className='space-y-4'>
-            <JumlahDaerahChart isLoading={jumlahDaerahQuery.isLoading} data={jumlahDaerahQuery.data?.data || []} />
+          <TabsContent value='gambaran-umum' className='space-y-4'>
+            <CombinedCharts
+              dataRealisasi={dataRealisasiTahunanQuery.data?.data || []}
+              dataJumlahDaerah={jumlahDaerahQuery.data?.data || []}
+              isLoading={dataRealisasiTahunanQuery.isLoading || jumlahDaerahQuery.isLoading}
+            />
           </TabsContent>
-          <TabsContent value='data-realisasi-tahunan' className='space-y-4'>
+          <TabsContent value='detail-rincian-data' className='space-y-4'>
             <DataRealisasiTahunanChart
               isLoading={dataRealisasiTahunanQuery.isLoading}
               data={dataRealisasiTahunanQuery.data?.data || []}

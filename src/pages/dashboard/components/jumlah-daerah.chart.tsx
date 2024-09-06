@@ -118,10 +118,10 @@ export function JumlahDaerahChart({ data, isLoading }: JumlahDaerahChartProps) {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <Card className='flex flex-col h-[400px]'>
                     <CardHeader>
-                        <CardTitle>Persentase Realisasi</CardTitle>
+                        <CardTitle>Pertumbuhan Target dan Realisasi Pendapatan Daerah per Tahun</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <ResponsiveContainer width="100%" height={250}>
+                        {/* <ResponsiveContainer width="100%" height={250}>
                             <RadialBarChart
                                 cx="50%"
                                 cy="50%"
@@ -169,7 +169,7 @@ export function JumlahDaerahChart({ data, isLoading }: JumlahDaerahChartProps) {
                                     />
                                 </PolarRadiusAxis>
                             </RadialBarChart>
-                        </ResponsiveContainer>
+                        </ResponsiveContainer> */}
                     </CardContent>
                     <CardFooter className="flex-col items-start gap-2 text-sm">
                         <div className="flex gap-2 font-medium leading-none">

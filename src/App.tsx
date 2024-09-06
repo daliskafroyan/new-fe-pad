@@ -14,12 +14,13 @@ function createQueryClient() {
         defaultOptions: {
             queries: {
                 retry: false,
+                refetchOnWindowFocus: false,
             },
         },
         queryCache: new QueryCache({
             onError: (error) => {
-                if (error.message === "Unauthenticated." 
-                    || error.message === "Authentication failed" 
+                if (error.message === "Unauthenticated."
+                    || error.message === "Authentication failed"
                     || error.message === "Invalid authentication"
                     || error.message === "Token expired"
                 ) {
