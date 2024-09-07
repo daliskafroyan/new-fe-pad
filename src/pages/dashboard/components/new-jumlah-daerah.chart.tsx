@@ -1,5 +1,4 @@
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis, LabelList, Legend, Line, ComposedChart } from "recharts";
-import { TrendingUp } from "lucide-react";
 import {
     Card,
     CardContent,
@@ -16,7 +15,7 @@ import {
 } from "@/components/ui/chart";
 import { DataRealisasiItem, JumlahDaerahItem } from '..';
 import { Skeleton } from "@/components/ui/skeleton";
-import { cn } from "@/lib/utils"; // Add this import
+import { cn } from "@/lib/utils";
 
 type DataRealisasiTahunanChartProps = {
     data: DataRealisasiItem[];
@@ -60,7 +59,6 @@ const formatToTrillions = (value: number) => {
     }
 };
 
-// Update the CustomLabel component
 const CustomLabel = ({ x, y, width, value }: any) => {
     return (
         <text x={x + width / 2} y={y - 10} fill="#666" textAnchor="middle" dominantBaseline="middle">

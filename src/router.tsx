@@ -109,6 +109,20 @@ const router = createBrowserRouter([
             lazy: async () => ({
               Component: (await import('@/pages/users/profile-user.page')).default,
             }),
+            children: [
+              {
+                index: true,
+                lazy: async () => ({
+                  Component: (await import('@/pages/users/user-detail.section.page')).default,
+                }),
+              },
+              {
+                path: 'update-password',
+                lazy: async () => ({
+                  Component: (await import('@/pages/users/update-password.page')).default,
+                }),
+              }
+            ]
           },
           {
             path: 'list-users',
@@ -116,12 +130,12 @@ const router = createBrowserRouter([
               Component: (await import('@/pages/users/user-management')).default,
             }),
           },
-          {
-            path: 'update/password',
-            lazy: async () => ({
-              Component: (await import('@/pages/users/update-password.page')).default,
-            }),
-          }
+          // {
+          //   path: 'update/password',
+          //   lazy: async () => ({
+          //     Component: (await import('@/pages/users/update-password.page')).default,
+          //   }),
+          // }
         ]
       },
       {

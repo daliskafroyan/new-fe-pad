@@ -3,10 +3,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/use-toast';
 import axios from 'axios';
-import { Layout } from '@/components/custom/layout';
-import { Search } from '@/components/search';
-import ThemeSwitch from '@/components/theme-switch';
-import { UserNav } from '@/components/user-nav';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 
@@ -25,7 +21,7 @@ export const UpdatePasswordCard: React.FC<UpdatePasswordCardProps> = ({ onSubmit
     };
 
     return (
-        <Card className="max-w-md">
+        <Card className="w-full">
             <CardHeader>
                 <CardTitle>Update Password</CardTitle>
             </CardHeader>
@@ -104,19 +100,9 @@ const UpdatePasswordPage = () => {
     };
 
     return (
-        <Layout>
-            <Layout.Header sticky>
-                <Search />
-                <div className='ml-auto flex items-center space-x-4'>
-                    <ThemeSwitch />
-                    <UserNav />
-                </div>
-            </Layout.Header>
 
-            <Layout.Body>
-                <UpdatePasswordCard onSubmit={handlePasswordUpdate} />
-            </Layout.Body>
-        </Layout>
+        <UpdatePasswordCard onSubmit={handlePasswordUpdate} />
+
     );
 };
 
