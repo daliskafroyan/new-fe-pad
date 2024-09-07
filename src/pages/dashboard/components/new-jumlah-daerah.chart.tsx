@@ -1,4 +1,4 @@
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis, LabelList, Legend } from "recharts";
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis, LabelList, Legend, Line, ComposedChart } from "recharts";
 import { TrendingUp } from "lucide-react";
 import {
     Card,
@@ -45,16 +45,26 @@ const chartConfig = {
         label: "Belum Realisasi",
         color: "hsl(var(--chart-2))",
     },
+    percentageRealisasi: {
+        label: "Persentase Realisasi",
+        color: "hsl(var(--chart-3))",
+    },
 } satisfies ChartConfig;
 
-const formatToMillions = (value: number) => {
-    return (value / 1000000000).toFixed(2);
+const formatToTrillions = (value: number) => {
+    const trillion = 1000000000000;
+    if (value >= trillion) {
+        return (value / trillion).toFixed(2) + 'T';
+    } else {
+        return (value / 1000000000).toFixed(2) + 'B';
+    }
 };
 
+// Update the CustomLabel component
 const CustomLabel = ({ x, y, width, value }: any) => {
     return (
         <text x={x + width / 2} y={y - 10} fill="#666" textAnchor="middle" dominantBaseline="middle">
-            {typeof value === 'number' ? formatToMillions(value) + 'M' : value}
+            {typeof value === 'number' ? formatToTrillions(value) : value}
         </text>
     );
 };
@@ -86,6 +96,7 @@ export function NewJumlahDaerahChart({ data, isLoading }: DataRealisasiTahunanCh
         tahun: item.tahun,
         realisasi: item.realisasi,
         target: item.target,
+        persentase: item.persentase_realisasi,
     }));
 
     if (isLoading) {
@@ -116,7 +127,7 @@ export function NewJumlahDaerahChart({ data, isLoading }: DataRealisasiTahunanCh
             </CardHeader>
             <CardContent>
                 <ChartContainer config={chartConfig}>
-                    <BarChart data={chartData} width={300} height={300}>
+                    <ComposedChart data={chartData} width={300} height={300}>
                         <CartesianGrid vertical={false} />
                         <XAxis
                             dataKey="tahun"
@@ -124,23 +135,46 @@ export function NewJumlahDaerahChart({ data, isLoading }: DataRealisasiTahunanCh
                             tickMargin={10}
                             axisLine={false}
                         />
-                        <YAxis axisLine={false} tickLine={false} />
+                        <YAxis
+                            yAxisId="left"
+                            axisLine={false}
+                            tickLine={false}
+                            tickFormatter={(value) => formatToTrillions(value)}
+                            width={80}
+                        />
+                        <YAxis
+                            yAxisId="right"
+                            orientation="right"
+                            axisLine={false}
+                            tickLine={false}
+                            tickFormatter={(value) => `${value}%`}
+                            domain={[0, 100]}
+                            width={50}
+                        />
                         <ChartTooltip
                             cursor={false}
                             content={<ChartTooltipContent indicator="dashed" />}
                         />
-                        <Bar dataKey="realisasi" fill={chartConfig.realisasi.color} radius={4} name={chartConfig.realisasi.label}>
+                        <Bar yAxisId="left" dataKey="realisasi" fill={chartConfig.realisasi.color} radius={4} name={chartConfig.realisasi.label}>
                             <LabelList dataKey="realisasi" content={<CustomLabel />} />
                         </Bar>
-                        <Bar dataKey="target" fill={chartConfig.target.color} radius={4} name={chartConfig.target.label}>
+                        <Bar yAxisId="left" dataKey="target" fill={chartConfig.target.color} radius={4} name={chartConfig.target.label}>
                             <LabelList dataKey="target" content={<CustomLabel />} />
                         </Bar>
+                        <Line
+                            yAxisId="right"
+                            type="monotone"
+                            dataKey="persentase"
+                            stroke="hsl(var(--chart-3))"
+                            name="Persentase Realisasi"
+                            dot={{ fill: 'hsl(var(--chart-3))' }}
+                        />
                         <Legend
                             verticalAlign="bottom"
                             height={36}
                             iconType="square"
                         />
-                    </BarChart>
+                    </ComposedChart>
                 </ChartContainer>
             </CardContent>
         </Card>
