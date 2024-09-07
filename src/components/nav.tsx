@@ -98,7 +98,7 @@ function NavLink({
           variant: checkActiveNav(href) ? 'default' : 'ghost',
           size: 'sm',
         }),
-        'h-12 justify-start text-wrap rounded-lg mx-4',
+        'h-12 justify-start text-wrap rounded-none mx-4',
         subLink && 'h-10 w-full border-l border-l-slate-500 px-2'
       )}
       aria-current={checkActiveNav(href) ? 'page' : undefined}
@@ -106,7 +106,7 @@ function NavLink({
       <div className='mr-2'>{icon}</div>
       {title}
       {label && (
-        <div className='ml-2 rounded-lg bg-primary px-1 text-[0.625rem] text-primary-foreground'>
+        <div className='ml-2 rounded-none bg-primary px-1 text-[0.625rem] text-primary-foreground'>
           {label}
         </div>
       )}
