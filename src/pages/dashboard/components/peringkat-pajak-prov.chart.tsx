@@ -107,10 +107,11 @@ function SkeletonLoader() {
     );
 }
 
-function PersentaseChart({ data }: { data: PajakProvItem[] }) {
+function PersentaseChart({ data }: { data: (PajakProvItem & { isTopPerformer: boolean })[] }) {
     const chartData = data.map(item => ({
         name: item.nama_daerah,
-        persentase: item.persentase
+        persentase: item.persentase,
+        isTopPerformer: item.isTopPerformer
     })).sort((a, b) => b.persentase - a.persentase);
 
     return (
@@ -130,7 +131,7 @@ function PersentaseChart({ data }: { data: PajakProvItem[] }) {
                             <Legend />
                             <Bar dataKey="persentase" name="Persentase" fill={chartConfig.persentase.color}>
                                 {chartData.map((entry, index) => (
-                                    <Cell key={`cell-${index}`} fill={entry.persentase >= 100 ? "green" : "red"} />
+                                    <Cell key={`cell-${index}`} fill={entry.isTopPerformer ? "green" : "red"} />
                                 ))}
                             </Bar>
                         </BarChart>
@@ -150,7 +151,10 @@ export function PeringkatPajakProvChart({ data, isLoading, selectedYear }: Perin
         return <div>No data available</div>;
     }
 
-    const mergedData = [...data.data_tertinggi, ...data.data_terendah];
+    const mergedData = [
+        ...data.data_tertinggi.map(item => ({ ...item, isTopPerformer: true })),
+        ...data.data_terendah.map(item => ({ ...item, isTopPerformer: false }))
+    ];
 
     return (
         <>
