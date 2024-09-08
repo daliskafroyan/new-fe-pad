@@ -92,11 +92,6 @@ export function JumlahDaerahChart({ data, isLoading }: JumlahDaerahChartProps) {
         { name: 'Daerah Belum Target', value: selectedData.jumlah_daerah_belum_target },
     ];
 
-    const radialData = [
-        { name: 'Realisasi', value: parseFloat(selectedData.persentase_sudah_r), fill: '#0088FE' },
-    ];
-
-
     return (
         <div className="space-y-4">
             <Select

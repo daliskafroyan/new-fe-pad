@@ -1,10 +1,8 @@
 import { Bar, ComposedChart, CartesianGrid, XAxis, YAxis, ResponsiveContainer, Cell, Tooltip, Legend, Line, BarChart } from "recharts";
-import { TrendingUp, TrendingDown } from "lucide-react";
 import {
     Card,
     CardContent,
     CardDescription,
-    CardFooter,
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
