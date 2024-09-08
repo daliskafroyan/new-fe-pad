@@ -29,12 +29,14 @@ interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
   header?: React.ReactNode
+  rowsPerPage?: number // Add this line
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
-  header
+  header,
+  rowsPerPage = 10 // Add this line with a default value
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = React.useState({})
   const [columnVisibility, setColumnVisibility] =
@@ -64,6 +66,11 @@ export function DataTable<TData, TValue>({
     getSortedRowModel: getSortedRowModel(),
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
+    initialState: {
+      pagination: {
+        pageSize: rowsPerPage,
+      },
+    },
   })
 
   return (

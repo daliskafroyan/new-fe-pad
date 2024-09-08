@@ -8,10 +8,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useCombobox } from 'downshift';
-import { ComposedChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Line } from 'recharts';
+import { ComposedChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Line, BarChart, Cell } from 'recharts';
 import { Card, CardContent } from "@/components/ui/card";
 import { useMutation } from '@tanstack/react-query';
 import { Skeleton } from "@/components/ui/skeleton";
+import { DataTable } from '@/pages/tasks/components/data-table';
+import { ColumnDef } from '@tanstack/react-table';
+import { ArrowUpDown, Download } from 'lucide-react';
+import { formatLargeNumber } from '@/lib/utils';
 
 function useDebounce(value: string, delay: number) {
     const [debouncedValue, setDebouncedValue] = useState(value);
@@ -83,6 +87,153 @@ type ChartData = {
     tahun: number;
     target: number;
 };
+
+function RealisasiPersentaseChart({ data }: { data: ChartData[] }) {
+    const chartData = data.map(item => ({
+        name: item.nama_akun,
+        persentase: item.persentase
+    })).sort((a, b) => b.persentase - a.persentase);
+
+    return (
+        <Card className="mt-8">
+            <CardContent className="p-6">
+                <h3 className="text-lg font-bold mb-4">Persentase Realisasi Pajak per Jenis</h3>
+                <div className="h-[500px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={chartData} layout="horizontal">
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <XAxis dataKey="name" type="category" angle={-45} textAnchor="end" interval={0} height={100} />
+                            <YAxis type="number" tickFormatter={(value) => `${value}%`} />
+                            <Tooltip formatter={(value) => `${Number(value).toFixed(2)}%`} />
+                            <Legend />
+                            <Bar dataKey="persentase" name="Persentase Realisasi" fill="#8884d8">
+                                {chartData.map((entry, index) => (
+                                    <Cell key={`cell-${index}`} fill={entry.persentase >= 100 ? "#4CAF50" : "#FF5722"} />
+                                ))}
+                            </Bar>
+                        </BarChart>
+                    </ResponsiveContainer>
+                </div>
+            </CardContent>
+        </Card>
+    );
+}
+
+function RealisasiPersentaseChartSkeleton() {
+    return (
+        <Card className="mt-8">
+            <CardContent className="p-6">
+                <Skeleton className="h-6 w-64 mb-4" />
+                <div className="h-[500px]">
+                    <Skeleton className="w-full h-full" />
+                </div>
+            </CardContent>
+        </Card>
+    );
+}
+
+const columns: ColumnDef<ChartData>[] = [
+    {
+        accessorKey: "kode_akun",
+        header: ({ column }) => {
+            return (
+                <Button
+                    variant="ghost"
+                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                >
+                    Kode Akun
+                    <ArrowUpDown className="ml-2 h-4 w-4" />
+                </Button>
+            )
+        },
+        sortingFn: "alphanumeric",
+    },
+    {
+        accessorKey: "nama_akun",
+        header: ({ column }) => {
+            return (
+                <Button
+                    variant="ghost"
+                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                >
+                    Nama Akun
+                    <ArrowUpDown className="ml-2 h-4 w-4" />
+                </Button>
+            )
+        },
+        sortingFn: "alphanumeric",
+    },
+    {
+        accessorKey: "target",
+        header: ({ column }) => {
+            return (
+                <Button
+                    variant="ghost"
+                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                >
+                    Target
+                    <ArrowUpDown className="ml-2 h-4 w-4" />
+                </Button>
+            )
+        },
+        cell: ({ row }) => formatLargeNumber(row.getValue("target")),
+        sortingFn: "basic",
+    },
+    {
+        accessorKey: "realisasi",
+        header: ({ column }) => {
+            return (
+                <Button
+                    variant="ghost"
+                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                >
+                    Realisasi
+                    <ArrowUpDown className="ml-2 h-4 w-4" />
+                </Button>
+            )
+        },
+        cell: ({ row }) => formatLargeNumber(row.getValue("realisasi")),
+        sortingFn: "basic",
+    },
+    {
+        accessorKey: "persentase",
+        header: ({ column }) => {
+            return (
+                <Button
+                    variant="ghost"
+                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                >
+                    Persentase
+                    <ArrowUpDown className="ml-2 h-4 w-4" />
+                </Button>
+            )
+        },
+        cell: ({ row }) => `${row.getValue<number>("persentase").toFixed(2)}%`,
+        sortingFn: "basic",
+    },
+];
+
+function downloadCSV(data: ChartData[]) {
+    const headers = ["Kode Akun", "Nama Akun", "Target", "Realisasi", "Persentase"];
+    const csvContent = [
+        headers.join(","),
+        ...data.map(row =>
+            [row.kode_akun, row.nama_akun, row.target, row.realisasi, `${row.persentase.toFixed(2)}%`].join(",")
+        )
+    ].join("\n");
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    if (link.download !== undefined) {
+        const url = URL.createObjectURL(blob);
+        link.setAttribute("href", url);
+        link.setAttribute("download", "data_pajak_perdaerah.csv");
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+}
 
 export default function DataPendapatanPeringkat() {
     const years = [2021, 2022, 2023];
@@ -342,8 +493,33 @@ export default function DataPendapatanPeringkat() {
                             )}
                         </CardContent>
                     </Card>
+
+                    {chartDataMutation.isPending ? (
+                        <RealisasiPersentaseChartSkeleton />
+                    ) : chartData.length > 0 ? (
+                        <>
+                            <RealisasiPersentaseChart data={chartData} />
+                            <Card className="mt-8">
+                                <CardContent className="p-6">
+                                    <div className="flex justify-between items-center mb-4">
+                                        <h3 className="text-lg font-bold">Data Pajak per Daerah</h3>
+                                        <Button onClick={() => downloadCSV(chartData)}>
+                                            <Download className="mr-2 h-4 w-4" />
+                                            Download CSV
+                                        </Button>
+                                    </div>
+                                    <DataTable
+                                        columns={columns}
+                                        data={chartData}
+                                        rowsPerPage={20}
+                                    />
+                                </CardContent>
+                            </Card>
+                        </>
+                    ) : null}
                 </div>
             </Layout.Body>
         </Layout>
     );
 }
+
