@@ -214,7 +214,7 @@ const router = createBrowserRouter([
           {
             path: 'Peringkat',
             lazy: async () => ({
-              Component: (await import('./pages/data/peringkat')).default,
+              Component: (await import('./pages/data-pendapatan/data-peringkat.page')).default,
             }),
           },
         ],

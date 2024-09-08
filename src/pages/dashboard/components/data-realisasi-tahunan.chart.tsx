@@ -157,7 +157,7 @@ export function DataRealisasiTahunanChart({ data, isLoading }: DataRealisasiTahu
                 onValueChange={(value) => setSelectedYear(Number(value))}
                 value={selectedYear?.toString()}
             >
-                <SelectTrigger className="w-[180px] bg-white">
+                <SelectTrigger className="w-[180px] bg-card">
                     <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
