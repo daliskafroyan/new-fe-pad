@@ -268,7 +268,7 @@ export default function DataPendapatanPeringkat() {
                 idProp: parseInt(selectedProvinsi),
             }),
         onSuccess: (data) => {
-            setDaerahList(data.data.data.filter(item => !item.is_prop));
+            setDaerahList(data.data.data);
         },
         onError: (error) => {
             console.error('Error fetching daerah list:', error);
@@ -351,7 +351,7 @@ export default function DataPendapatanPeringkat() {
         if (selectedProvinsi) {
             fetchDaerahList(debouncedDaerahInputValue);
         }
-    }, [selectedProvinsi, debouncedInputValue]);
+    }, [selectedProvinsi, debouncedDaerahInputValue]);
 
     useEffect(() => {
         setSelectedDaerah('');
