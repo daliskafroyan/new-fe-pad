@@ -296,6 +296,7 @@ export default function DataPendapatanPeringkat() {
         getItemProps,
         highlightedIndex,
         selectedItem,
+        reset: resetProvinsiCombobox,
     } = useCombobox({
         items: provinsiList,
         onInputValueChange: ({ inputValue }) => {
@@ -334,6 +335,18 @@ export default function DataPendapatanPeringkat() {
     const handleSearch = () => {
         if (!selectedYear || !selectedDaerah) return;
         chartDataMutation.mutate();
+    };
+
+    const handleReset = () => {
+        setSelectedProvinsi('');
+        setSelectedDaerah('');
+        setInputValue('');
+        setDaerahInputValue('');
+        setChartData([]);
+        resetProvinsiCombobox();
+        daerahCombobox.reset();
+        setProvinsiList([]);
+        setDaerahList([]);
     };
 
     const formatLargeNumber = (value: number) => {
@@ -446,6 +459,12 @@ export default function DataPendapatanPeringkat() {
                             disabled={chartDataMutation.isPending || !selectedYear || !selectedDaerah}
                         >
                             {chartDataMutation.isPending ? 'Loading...' : 'Cari'}
+                        </Button>
+                        <Button
+                            onClick={handleReset}
+                            variant="outline"
+                        >
+                            Reset
                         </Button>
                     </div>
 
