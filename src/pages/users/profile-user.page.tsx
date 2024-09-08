@@ -1,5 +1,5 @@
 import { Layout } from '@/components/custom/layout';
-import { Search } from '@/components/search';
+;
 import ThemeSwitch from '@/components/theme-switch';
 import { UserNav } from '@/components/user-nav';
 import { Separator } from '@/components/ui/separator';
@@ -11,7 +11,7 @@ const ProfileUserPage = () => {
     return (
         <Layout>
             <Layout.Header sticky>
-                <Search />
+
                 <div className='ml-auto flex items-center space-x-4'>
                     <ThemeSwitch />
                     <UserNav />

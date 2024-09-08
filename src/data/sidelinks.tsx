@@ -58,7 +58,6 @@ const iconsMap: Record<string, JSX.Element> = {
   "Not Found": <IconError404 size={18} />,
   "Internal Server Error": <IconServerOff size={18} />,
   "Maintenance Error": <IconBarrierBlock size={18} />,
-  "Update Password": <IconLock size={18} />,
   "Trucks": <IconTruck size={18} />,
   "Detail RBAC Users": <IconUserShield size={18} />,
   "List Menu": <IconMenu2 size={18} />,

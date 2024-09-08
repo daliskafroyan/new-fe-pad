@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import api from '@/api';
 import { Layout } from '@/components/custom/layout';
-import { Search } from '@/components/search';
+;
 import ThemeSwitch from '@/components/theme-switch';
 import { UserNav } from '@/components/user-nav';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -101,7 +101,7 @@ function AddListButton() {
                                 <FormItem>
                                     <FormLabel>Nama Sub Menu</FormLabel>
                                     <FormControl>
-                                        <Input  placeholder="Nama sub menu" {...field} />
+                                        <Input placeholder="Nama sub menu" {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -169,7 +169,7 @@ type MenuListResponse = {
 };
 
 const ListMenuPage = () => {
-    const [searchTerm, setSearchTerm] = useState('');
+    const [searchTerm, _] = useState('');
 
     const menuListQuery = useQuery<MenuListResponse>({
         queryKey: ['menu-list'],
@@ -217,7 +217,6 @@ const ListMenuPage = () => {
     return (
         <Layout>
             <Layout.Header sticky>
-                <Search placeholder="Search menus..." onChange={(e) => setSearchTerm(e.target.value)} />
                 <div className='ml-auto flex items-center space-x-4'>
                     <ThemeSwitch />
                     <UserNav />
@@ -226,13 +225,13 @@ const ListMenuPage = () => {
 
             <Layout.Body>
                 <Card className="w-full mb-8">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle>List Menu</CardTitle>
-                    <AddListButton />
-                </CardHeader>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle>List Menu</CardTitle>
+                        <AddListButton />
+                    </CardHeader>
                     <CardContent>
                         <Table>
-                        <TableHeader>
+                            <TableHeader>
                                 <TableRow>
                                     <TableHead>ID</TableHead>
                                     <TableHead>Menu</TableHead>

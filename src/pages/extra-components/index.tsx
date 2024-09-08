@@ -9,7 +9,7 @@ import { PinInput, PinInputField } from '@/components/custom/pin-input'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Separator } from '@/components/ui/separator'
 import { Input } from '@/components/ui/input'
-import { Search } from '@/components/search'
+
 import ThemeSwitch from '@/components/theme-switch'
 import { UserNav } from '@/components/user-nav'
 
@@ -39,7 +39,7 @@ export default function ExtraComponents() {
       {/* ===== Top Heading ===== */}
       <Layout.Header>
         <div className='ml-auto flex items-center space-x-4'>
-          <Search />
+
           <ThemeSwitch />
           <UserNav />
         </div>

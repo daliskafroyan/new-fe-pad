@@ -1,5 +1,4 @@
 import { Layout } from '@/components/custom/layout'
-import { Search } from '@/components/search'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import ThemeSwitch from '@/components/theme-switch'
 import { UserNav } from '@/components/user-nav'
@@ -132,7 +131,6 @@ export default function Dashboard() {
       {/* ===== Top Heading ===== */}
       <Layout.Header>
         <div className='ml-auto flex items-center space-x-4'>
-          <Search />
           <ThemeSwitch />
           <UserNav />
         </div>

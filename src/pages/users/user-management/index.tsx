@@ -27,7 +27,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { IconChevronLeft, IconChevronRight, IconCirclePlus, IconRefresh } from '@tabler/icons-react'
 import { Layout } from '@/components/custom/layout'
-import { Search } from '@/components/search'
+
 import ThemeSwitch from '@/components/theme-switch'
 import { UserNav } from '@/components/user-nav'
 import { Button } from '@/components/custom/button'
@@ -454,7 +454,7 @@ export default function UserManagement() {
     return (
         <Layout>
             <Layout.Header sticky>
-                <Search />
+
                 <div className='ml-auto flex items-center space-x-4'>
                     <ThemeSwitch />
                     <UserNav />

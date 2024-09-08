@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Layout } from '@/components/custom/layout';
-import { Search } from '@/components/search';
+;
 import ThemeSwitch from '@/components/theme-switch';
 import { UserNav } from '@/components/user-nav';
 import api from '@/api';
@@ -378,7 +378,7 @@ export default function DataPendapatanPeringkat() {
         <Layout className='h-[100vh]'>
             <Layout.Header>
                 <div className='ml-auto flex items-center space-x-4'>
-                    <Search />
+
                     <ThemeSwitch />
                     <UserNav />
                 </div>
