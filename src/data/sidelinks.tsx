@@ -70,6 +70,7 @@ interface Menu {
   sub_menus: Array<{
     nama_sub_menu: string | null;
     url: string;
+    is_menu: boolean;
   }>;
 }
 
@@ -80,7 +81,7 @@ export function generateSidelinks(userAuthorization: any[] | null) {
 
   return userAuthorization.flatMap(role => role.menus.map((menu: Menu) => {
     const subMenus = menu.sub_menus
-      .filter(sub => sub.nama_sub_menu !== null)
+      .filter(sub => sub.nama_sub_menu !== null && sub.is_menu)
       .map(sub => ({
         title: sub.nama_sub_menu ?? menu.nama_menu,
         label: '',
