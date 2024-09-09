@@ -13,6 +13,10 @@ import {
     ChartTooltipContent,
 } from "@/components/ui/chart";
 import { formatLargeNumber } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Download } from "lucide-react";
+import { useCurrentPng } from 'recharts-to-png';
+import FileSaver from 'file-saver';
 
 type PajakProvItem = {
     jns_pemda: string;
@@ -39,19 +43,20 @@ type PeringkatPajakProvChartProps = {
 const chartConfig = {
     realisasi: {
         label: "Realisasi",
-        color: "hsl(var(--chart-1))",
+        color: "red",
     },
     target: {
         label: "Target",
-        color: "hsl(var(--chart-2))",
+        color: "green",
     },
     persentase: {
         label: "Persentase",
-        color: "hsl(var(--chart-3))",
+        color: "black",
     },
 } satisfies ChartConfig;
 
 export function MergedDataCard({ data }: { data: PajakProvItem[] }) {
+    const [getPng, { ref, isLoading }] = useCurrentPng();
     const chartData = data.map(item => ({
         name: item.nama_daerah,
         realisasi: item.realisasi,
@@ -59,16 +64,28 @@ export function MergedDataCard({ data }: { data: PajakProvItem[] }) {
         persentase: item.persentase
     })).sort((a, b) => b.persentase - a.persentase);
 
+    const handleDownload = async () => {
+        const png = await getPng();
+        if (png) {
+            FileSaver.saveAs(png, 'peringkat-pajak-provinsi.png');
+        }
+    };
+
     return (
         <Card className="w-full">
-            <CardHeader>
-                <CardTitle>Peringkat Pajak Provinsi</CardTitle>
-                <CardDescription>Perbandingan Realisasi, Target, dan Persentase</CardDescription>
+            <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                    <CardTitle>Peringkat Pajak Provinsi</CardTitle>
+                    <CardDescription>Perbandingan Realisasi, Target, dan Persentase</CardDescription>
+                </div>
+                <Button variant="ghost" size="icon" onClick={handleDownload} disabled={isLoading}>
+                    <Download className="h-4 w-4" />
+                </Button>
             </CardHeader>
             <CardContent>
                 <ChartContainer config={chartConfig}>
                     <ResponsiveContainer width="100%" height={600}>
-                        <ComposedChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                        <ComposedChart ref={ref} data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
                             <CartesianGrid strokeDasharray="3 3" />
                             <XAxis dataKey="name" type="category" angle={-45} textAnchor="end" interval={0} height={100} />
                             <YAxis yAxisId="left" orientation="left" type="number" tickFormatter={(value) => formatLargeNumber(value)} />
@@ -108,22 +125,35 @@ function SkeletonLoader() {
 }
 
 function PersentaseChart({ data }: { data: (PajakProvItem & { isTopPerformer: boolean })[] }) {
+    const [getPng, { ref, isLoading }] = useCurrentPng();
     const chartData = data.map(item => ({
         name: item.nama_daerah,
         persentase: item.persentase,
         isTopPerformer: item.isTopPerformer
     })).sort((a, b) => b.persentase - a.persentase);
 
+    const handleDownload = async () => {
+        const png = await getPng();
+        if (png) {
+            FileSaver.saveAs(png, 'persentase-realisasi-pajak-provinsi.png');
+        }
+    };
+
     return (
         <Card className="w-full mt-4">
-            <CardHeader>
-                <CardTitle>Persentase Realisasi Pajak Provinsi</CardTitle>
-                <CardDescription>Persentase Realisasi terhadap Target</CardDescription>
+            <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                    <CardTitle>Persentase Realisasi Pajak Provinsi</CardTitle>
+                    <CardDescription>Persentase Realisasi terhadap Target</CardDescription>
+                </div>
+                <Button variant="ghost" size="icon" onClick={handleDownload} disabled={isLoading}>
+                    <Download className="h-4 w-4" />
+                </Button>
             </CardHeader>
             <CardContent>
                 <ChartContainer config={chartConfig}>
                     <ResponsiveContainer width="100%" height={600}>
-                        <BarChart data={chartData} layout="horizontal">
+                        <BarChart ref={ref} data={chartData} layout="horizontal">
                             <CartesianGrid vertical={false} />
                             <XAxis dataKey="name" type="category" angle={-45} textAnchor="end" interval={0} height={100} />
                             <YAxis type="number" tickFormatter={(value) => `${value}%`} />

@@ -39,6 +39,8 @@
     "cmdk": "^0.2.1",
     "dayjs": "^1.11.10",
     "downshift": "^9.0.8",
+    "file-saver": "^2.0.5",
+    "html2canvas": "^1.4.1",
     "lucide-react": "^0.438.0",
     "react": "^18.2.0",
     "react-day-picker": "^8.10.1",
@@ -47,12 +49,14 @@
     "react-router-dom": "^6.22.3",
     "react-syntax-highlighter": "^15.5.0",
     "recharts": "^2.12.5",
+    "recharts-to-png": "^2.3.2",
     "tailwind-merge": "^2.2.2",
     "tailwindcss-animate": "^1.0.7",
     "zod": "^3.22.4",
     "zustand": "^4.5.4"
   },
   "devDependencies": {
+    "@types/file-saver": "^2.0.7",
     "@types/node": "^20.12.7",
     "@types/react": "^18.2.79",
     "@types/react-dom": "^18.2.25",

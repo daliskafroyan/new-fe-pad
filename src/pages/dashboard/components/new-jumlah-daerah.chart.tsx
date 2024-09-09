@@ -16,6 +16,10 @@ import {
 import { DataRealisasiItem, JumlahDaerahItem } from '..';
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Download } from "lucide-react";
+import { useCurrentPng } from 'recharts-to-png';
+import FileSaver from 'file-saver';
 
 type DataRealisasiTahunanChartProps = {
     data: DataRealisasiItem[];
@@ -30,23 +34,23 @@ type RealisasiComparisonChartProps = {
 const chartConfig = {
     realisasi: {
         label: "Realisasi",
-        color: "hsl(var(--chart-1))",
+        color: "red",
     },
     target: {
         label: "Target",
-        color: "hsl(var(--chart-2))",
+        color: "green",
     },
     sudahRealisasi: {
         label: "Sudah Realisasi",
-        color: "hsl(var(--chart-1))",
+        color: "red",
     },
     belumRealisasi: {
         label: "Belum Realisasi",
-        color: "hsl(var(--chart-2))",
+        color: "green",
     },
     percentageRealisasi: {
         label: "Persentase Realisasi",
-        color: "hsl(var(--chart-3))",
+        color: "black",
     },
 } satisfies ChartConfig;
 
@@ -89,6 +93,7 @@ export function CombinedCharts({ dataRealisasi, dataJumlahDaerah, isLoading }: {
 }
 
 export function NewJumlahDaerahChart({ data, isLoading }: DataRealisasiTahunanChartProps) {
+    const [getPng, { ref, isLoading: isPngLoading }] = useCurrentPng();
     const filteredData = data.filter(item => item.kode_akun === "4.1");
     const chartData = filteredData.map(item => ({
         tahun: item.tahun,
@@ -96,6 +101,13 @@ export function NewJumlahDaerahChart({ data, isLoading }: DataRealisasiTahunanCh
         target: item.target,
         persentase: item.persentase_realisasi,
     }));
+
+    const handleDownload = async () => {
+        const png = await getPng();
+        if (png) {
+            FileSaver.saveAs(png, 'pertumbuhan-target-realisasi.png');
+        }
+    };
 
     if (isLoading) {
         return (
@@ -117,15 +129,20 @@ export function NewJumlahDaerahChart({ data, isLoading }: DataRealisasiTahunanCh
 
     return (
         <Card className={cn("h-full", isLoading && "flex flex-col")}>
-            <CardHeader>
-                <CardTitle>Pertumbuhan Target dan Realisasi Pendapatan Daerah per Tahun</CardTitle>
-                <CardDescription>
-                    Tahun {Math.min(...chartData.map(item => item.tahun))} - {Math.max(...chartData.map(item => item.tahun))}
-                </CardDescription>
+            <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                    <CardTitle>Pertumbuhan Target dan Realisasi Pendapatan Daerah per Tahun</CardTitle>
+                    <CardDescription>
+                        Tahun {Math.min(...chartData.map(item => item.tahun))} - {Math.max(...chartData.map(item => item.tahun))}
+                    </CardDescription>
+                </div>
+                <Button variant="ghost" size="icon" onClick={handleDownload} disabled={isPngLoading}>
+                    <Download className="h-4 w-4" />
+                </Button>
             </CardHeader>
             <CardContent>
                 <ChartContainer config={chartConfig}>
-                    <ComposedChart data={chartData} width={300} height={300}>
+                    <ComposedChart ref={ref} data={chartData} width={300} height={300}>
                         <CartesianGrid vertical={false} />
                         <XAxis
                             dataKey="tahun"
@@ -180,11 +197,19 @@ export function NewJumlahDaerahChart({ data, isLoading }: DataRealisasiTahunanCh
 }
 
 export function RealisasiComparisonChart({ data, isLoading }: RealisasiComparisonChartProps) {
+    const [getPng, { ref, isLoading: isPngLoading }] = useCurrentPng();
     const chartData = data.map(item => ({
         tahun: item.tahun,
         sudahRealisasi: item.jumlah_daerah_realisasi,
         belumRealisasi: item.jumlah_daerah_belum_realisasi,
     }));
+
+    const handleDownload = async () => {
+        const png = await getPng();
+        if (png) {
+            FileSaver.saveAs(png, 'perbandingan-realisasi-daerah.png');
+        }
+    };
 
     if (isLoading) {
         return (
@@ -202,15 +227,20 @@ export function RealisasiComparisonChart({ data, isLoading }: RealisasiCompariso
 
     return (
         <Card className={cn("h-full", isLoading && "flex flex-col")}>
-            <CardHeader>
-                <CardTitle>Perbandingan Daerah yang Sudah dan Belum Realisasi</CardTitle>
-                <CardDescription>
-                    Tahun {Math.min(...chartData.map(item => item.tahun))} - {Math.max(...chartData.map(item => item.tahun))}
-                </CardDescription>
+            <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                    <CardTitle>Perbandingan Daerah yang Sudah dan Belum Realisasi</CardTitle>
+                    <CardDescription>
+                        Tahun {Math.min(...chartData.map(item => item.tahun))} - {Math.max(...chartData.map(item => item.tahun))}
+                    </CardDescription>
+                </div>
+                <Button variant="ghost" size="icon" onClick={handleDownload} disabled={isPngLoading}>
+                    <Download className="h-4 w-4" />
+                </Button>
             </CardHeader>
             <CardContent>
                 <ChartContainer config={chartConfig}>
-                    <BarChart data={chartData} width={300} height={300}>
+                    <BarChart ref={ref} data={chartData} width={300} height={300}>
                         <CartesianGrid vertical={false} />
                         <XAxis
                             dataKey="tahun"

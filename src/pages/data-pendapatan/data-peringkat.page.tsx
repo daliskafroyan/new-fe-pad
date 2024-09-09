@@ -9,13 +9,15 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useCombobox } from 'downshift';
 import { ComposedChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Line, BarChart, Cell } from 'recharts';
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useMutation } from '@tanstack/react-query';
 import { Skeleton } from "@/components/ui/skeleton";
 import { DataTable } from '@/pages/tasks/components/data-table';
 import { ColumnDef } from '@tanstack/react-table';
 import { ArrowUpDown, Download } from 'lucide-react';
 import { formatLargeNumber } from '@/lib/utils';
+import { useCurrentPng } from 'recharts-to-png';
+import FileSaver from 'file-saver';
 
 function useDebounce(value: string, delay: number) {
     const [debouncedValue, setDebouncedValue] = useState(value);
@@ -89,20 +91,68 @@ type ChartData = {
 };
 
 function RealisasiPersentaseChart({ data }: { data: ChartData[] }) {
+    const [getPng, { ref, isLoading: isPngLoading }] = useCurrentPng();
     const chartData = data.map(item => ({
         name: item.nama_akun,
         persentase: item.persentase
     })).sort((a, b) => b.persentase - a.persentase);
 
+    const handleDownload = async () => {
+        const png = await getPng();
+        if (png) {
+            FileSaver.saveAs(png, 'realisasi-persentase-chart.png');
+        }
+    };
+
     return (
         <Card className="mt-8">
+            <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                    <CardTitle>Persentase Realisasi Pajak per Jenis</CardTitle>
+                </div>
+                <Button variant="ghost" size="icon" onClick={handleDownload} disabled={isPngLoading}>
+                    <Download className="h-4 w-4" />
+                </Button>
+            </CardHeader>
             <CardContent className="p-6">
-                <h3 className="text-lg font-bold mb-4">Persentase Realisasi Pajak per Jenis</h3>
                 <div className="h-[500px]">
                     <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={chartData} layout="horizontal">
+                        <BarChart 
+                            ref={ref} 
+                            data={chartData} 
+                            layout="horizontal"
+                            margin={{
+                                top: 20,
+                                right: 30,
+                                left: 140,
+                                bottom: 90,
+                            }}
+                        >
                             <CartesianGrid strokeDasharray="3 3" />
-                            <XAxis dataKey="name" type="category" angle={-45} textAnchor="end" interval={0} height={100} />
+                            <XAxis 
+                                dataKey="name" 
+                                type="category" 
+                                interval={0} 
+                                tick={(props) => {
+                                    const { x, y, payload } = props;
+                                    return (
+                                        <g transform={`translate(${x},${y})`}>
+                                            <text 
+                                                x={0} 
+                                                y={0} 
+                                                dy={10} 
+                                                textAnchor="end" 
+                                                fill="#666" 
+                                                transform="rotate(-10)"
+                                                fontSize={10}
+                                            >
+                                                {payload.value}
+                                            </text>
+                                        </g>
+                                    );
+                                }}
+                                height={100}
+                            />
                             <YAxis type="number" tickFormatter={(value) => `${value}%`} />
                             <Tooltip formatter={(value) => `${Number(value).toFixed(2)}%`} />
                             <Legend />
@@ -349,13 +399,6 @@ export default function DataPendapatanPeringkat() {
         setDaerahList([]);
     };
 
-    const formatLargeNumber = (value: number) => {
-        if (value >= 1e9) return (value / 1e9).toFixed(1) + ' Miliar';
-        if (value >= 1e6) return (value / 1e6).toFixed(1) + ' Juta';
-        if (value >= 1e3) return (value / 1e3).toFixed(1) + ' K';
-        return value.toString();
-    };
-
     useEffect(() => {
         fetchProvinsiList(debouncedInputValue);
     }, [debouncedInputValue]);
@@ -373,6 +416,15 @@ export default function DataPendapatanPeringkat() {
             daerahMutation.mutate('');
         }
     }, [selectedProvinsi]);
+
+    const [getPng, { ref, isLoading: isPngLoading }] = useCurrentPng();
+
+    const handleDownload = async () => {
+        const png = await getPng();
+        if (png) {
+            FileSaver.saveAs(png, 'data-pendapatan-peringkat.png');
+        }
+    };
 
     return (
         <Layout className='h-[100vh]'>
@@ -469,6 +521,12 @@ export default function DataPendapatanPeringkat() {
                     </div>
 
                     <Card className="mt-8">
+                        <CardHeader className="flex flex-row items-center justify-between">
+                            { chartData.length > 0 ? (<CardTitle>Data Pendapatan Peringkat</CardTitle>) : null}
+                            { chartData.length > 0 ? (<Button variant="ghost" size="icon" onClick={handleDownload} disabled={isPngLoading}>
+                                <Download className="h-4 w-4" />
+                            </Button>) : null}
+                        </CardHeader>
                         <CardContent className="p-6">
                             {chartDataMutation.isPending ? (
                                 <div className="h-[500px]">
@@ -478,16 +536,39 @@ export default function DataPendapatanPeringkat() {
                                 <div className="h-[500px]">
                                     <ResponsiveContainer width="100%" height="100%">
                                         <ComposedChart
+                                            ref={ref}
                                             data={chartData}
                                             margin={{
                                                 top: 20,
                                                 right: 30,
                                                 left: 20,
-                                                bottom: 5,
+                                                bottom: 90, 
                                             }}
                                         >
                                             <CartesianGrid strokeDasharray="3 3" />
-                                            <XAxis dataKey="nama_akun" angle={-45} textAnchor="end" interval={0} height={100} />
+                                            <XAxis 
+                                                dataKey="nama_akun" 
+                                                interval={0} 
+                                                tick={(props) => {
+                                                    const { x, y, payload } = props;
+                                                    return (
+                                                        <g transform={`translate(${x},${y})`}>
+                                                            <text 
+                                                                x={0} 
+                                                                y={0} 
+                                                                dy={10} 
+                                                                textAnchor="end" 
+                                                                fill="#666" 
+                                                                transform="rotate(-10)"
+                                                                fontSize={10}
+                                                            >
+                                                                {payload.value}
+                                                            </text>
+                                                        </g>
+                                                    );
+                                                }}
+                                                height={100}
+                                            />
                                             <YAxis yAxisId="left" tickFormatter={formatLargeNumber} />
                                             <YAxis yAxisId="right" orientation="right" domain={[0, 100]} tickFormatter={(value) => `${value}%`} />
                                             <Tooltip

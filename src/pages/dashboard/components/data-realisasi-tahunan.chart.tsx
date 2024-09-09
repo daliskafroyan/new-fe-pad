@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis, ResponsiveContainer, Cell } from "recharts";
-import { TrendingUp, TrendingDown } from "lucide-react";
+import { TrendingUp, TrendingDown, Download } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
 import {
     Card,
     CardContent,
@@ -17,6 +18,8 @@ import {
     ChartTooltipContent,
 } from "@/components/ui/chart";
 import { formatLargeNumber } from "@/lib/utils";
+import { useCurrentPng } from 'recharts-to-png';
+import FileSaver from 'file-saver';
 
 type DataRealisasiItem = {
     kode_akun: string;
@@ -35,15 +38,16 @@ type DataRealisasiTahunanChartProps = {
 const chartConfig = {
     realisasi: {
         label: "Realisasi",
-        color: "hsl(var(--chart-1))",
+        color: "red",
     },
     target: {
         label: "Target",
-        color: "hsl(var(--chart-2))",
+        color: "green",
     },
 } satisfies ChartConfig;
 
 function DataCard({ item }: { item: DataRealisasiItem }) {
+    const [getPng, { ref, isLoading }] = useCurrentPng();
     const chartData = [
         { name: 'Realisasi', value: item.realisasi },
         { name: 'Target', value: item.target },
@@ -52,16 +56,28 @@ function DataCard({ item }: { item: DataRealisasiItem }) {
     const isAboveTarget = item.persentase_realisasi > 100;
     const difference = Math.abs(item.persentase_realisasi - 100).toFixed(2);
 
+    const handleDownload = async () => {
+        const png = await getPng();
+        if (png) {
+            FileSaver.saveAs(png, `realisasi-${item.kode_akun}.png`);
+        }
+    };
+
     return (
         <Card className="w-full">
-            <CardHeader>
-                <CardTitle>{item.kode_akun}</CardTitle>
-                <CardDescription>{item.nama_akun}</CardDescription>
+            <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                    <CardTitle>{item.kode_akun}</CardTitle>
+                    <CardDescription>{item.nama_akun}</CardDescription>
+                </div>
+                <Button variant="ghost" size="icon" onClick={handleDownload} disabled={isLoading}>
+                    <Download className="h-4 w-4" />
+                </Button>
             </CardHeader>
             <CardContent>
                 <ChartContainer config={chartConfig}>
                     <ResponsiveContainer width="100%" height={200}>
-                        <BarChart data={chartData}>
+                        <BarChart ref={ref} data={chartData}>
                             <CartesianGrid vertical={false} />
                             <XAxis
                                 dataKey="name"
