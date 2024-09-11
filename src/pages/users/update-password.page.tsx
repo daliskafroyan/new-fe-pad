@@ -80,7 +80,7 @@ const UpdatePasswordPage = () => {
         }
 
         try {
-            await axios.post('/users/detail-users/update-password', {
+            await axios.put('/users/detail-users/update-password', {
                 passwordLama: oldPassword,
                 konfirmasiPassword: confirmPassword,
                 passwordBaru: newPassword,
