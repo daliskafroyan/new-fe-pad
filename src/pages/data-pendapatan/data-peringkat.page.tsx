@@ -18,6 +18,7 @@ import { ArrowUpDown, Download } from 'lucide-react';
 import { formatLargeNumber } from '@/lib/utils';
 import { useCurrentPng } from 'recharts-to-png';
 import FileSaver from 'file-saver';
+import * as XLSX from 'xlsx';
 
 function useDebounce(value: string, delay: number) {
     const [debouncedValue, setDebouncedValue] = useState(value);
@@ -263,26 +264,52 @@ const columns: ColumnDef<ChartData>[] = [
     },
 ];
 
-function downloadCSV(data: ChartData[]) {
-    const headers = ["Kode Akun", "Nama Akun", "Target", "Realisasi", "Persentase"];
-    const csvContent = [
-        headers.join(","),
-        ...data.map(row =>
-            [row.kode_akun, row.nama_akun, row.target, row.realisasi, `${row.persentase.toFixed(2)}%`].join(",")
-        )
-    ].join("\n");
+// function downloadCSV(data: ChartData[]) {
+//     const headers = ["Kode Akun", "Nama Akun", "Target", "Realisasi", "Persentase"];
+//     const csvContent = [
+//         headers.join(","),
+//         ...data.map(row =>
+//             [row.kode_akun, row.nama_akun, row.target, row.realisasi, `${row.persentase.toFixed(2)}%`].join(",")
+//         )
+//     ].join("\n");
 
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement("a");
-    if (link.download !== undefined) {
-        const url = URL.createObjectURL(blob);
-        link.setAttribute("href", url);
-        link.setAttribute("download", "data_pajak_perdaerah.csv");
-        link.style.visibility = 'hidden';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    }
+//     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+//     const link = document.createElement("a");
+//     if (link.download !== undefined) {
+//         const url = URL.createObjectURL(blob);
+//         link.setAttribute("href", url);
+//         link.setAttribute("download", "data_pajak_perdaerah.csv");
+//         link.style.visibility = 'hidden';
+//         document.body.appendChild(link);
+//         link.click();
+//         document.body.removeChild(link);
+//     }
+// }
+
+function downloadExcel(data: ChartData[]) {
+    const headers = ["Tahun","Nama Daerah","Kode Akun", "Nama Akun", "Target", "Realisasi", "Persentase"];
+    
+    // Membuat data untuk worksheet
+    const worksheetData = [
+        headers,
+        ...data.map(row => [
+            row.tahun,
+            row.nama_daerah,
+            row.kode_akun, 
+            row.nama_akun, 
+            row.target, 
+            row.realisasi, 
+            `${row.persentase.toFixed(2)}%`
+        ])
+    ];
+    
+    // Membuat worksheet dan workbook
+    const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Data Pajak Perdaerah");
+    
+    // Menghasilkan file Excel
+    XLSX.writeFile(workbook, "data_pajak_perdaerah.xlsx");
 }
 
 export default function DataPendapatanPeringkat() {
@@ -603,9 +630,9 @@ export default function DataPendapatanPeringkat() {
                                 <CardContent className="p-6">
                                     <div className="flex justify-between items-center mb-4">
                                         <h3 className="text-lg font-bold">Data Pajak per Daerah</h3>
-                                        <Button onClick={() => downloadCSV(chartData)}>
+                                        <Button onClick={() => downloadExcel(chartData)}>
                                             <Download className="mr-2 h-4 w-4" />
-                                            Download CSV
+                                            Download Excel
                                         </Button>
                                     </div>
                                     <DataTable

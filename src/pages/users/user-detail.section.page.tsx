@@ -20,6 +20,7 @@ interface UserDetailResponse {
     code: number;
     status: boolean;
     data: UserDetail;
+    roles:string;
 }
 
 
@@ -41,21 +42,9 @@ const UserProfileCard = () => {
         },
     });
 
-    const rolesQuery = useQuery<RoleData[]>({
-        queryKey: ['list-roles'],
-        queryFn: async () => {
-            const response = await api.get("/rbac/list-roles-all");
-            return response.data.list;
-        },
-    });
-
     const userDetail = userDetailQuery.data?.data;
-    const roles = rolesQuery.data || [];
+    const namaRoles = userDetailQuery.data?.roles;
 
-    const getRoleName = (roleId: number) => {
-        const role = roles.find(r => r.id === roleId);
-        return role ? role.nama_roles : 'Unknown Role';
-    };
     return (
         <Card className="w-full">
             <CardHeader>
@@ -77,7 +66,7 @@ const UserProfileCard = () => {
                     </div>
                     <div className="flex flex-col sm:flex-row sm:justify-between">
                         <strong className="mb-1 sm:mb-0">Role:</strong>
-                        <span>{getRoleName(userDetail?.id_roles || 0)}</span>
+                        <span>{namaRoles}</span>
                     </div>
                 </div>
             </CardContent>

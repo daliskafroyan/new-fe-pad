@@ -274,7 +274,7 @@ export default function Dashboard() {
               data={dataRealisasiTahunanQuery.data?.data || []}
               selectedYear={selectedYear}
             />
-            <PeringkatPajakProvChart
+            {/* <PeringkatPajakProvChart
               data={dataProv}
               isLoading={isLoadingProv}
               selectedYear={selectedYear}
@@ -288,7 +288,7 @@ export default function Dashboard() {
               data={dataKota}
               isLoading={isLoadingKota}
               selectedYear={selectedYear}
-            />
+            /> */}
           </TabsContent>
         </Tabs>
       </Layout.Body>

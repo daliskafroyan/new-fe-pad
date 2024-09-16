@@ -113,7 +113,7 @@ export function JumlahDaerahChart({ data, isLoading }: JumlahDaerahChartProps) {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <Card className='flex flex-col h-[400px]'>
                     <CardHeader>
-                        <CardTitle>Pertumbuhan Target dan Realisasi Pendapatan Daerah per Tahun</CardTitle>
+                        <CardTitle>Pertumbuhan Target dan Realisasi Pendapatan Asli Daerah per Tahun</CardTitle>
                     </CardHeader>
                     <CardContent>
                         {/* <ResponsiveContainer width="100%" height={250}>

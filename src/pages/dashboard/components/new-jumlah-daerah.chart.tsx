@@ -131,7 +131,7 @@ export function NewJumlahDaerahChart({ data, isLoading }: DataRealisasiTahunanCh
         <Card className={cn("h-full", isLoading && "flex flex-col")}>
             <CardHeader className="flex flex-row items-center justify-between">
                 <div>
-                    <CardTitle>Pertumbuhan Target dan Realisasi Pendapatan Daerah per Tahun</CardTitle>
+                    <CardTitle>Pertumbuhan Target dan Realisasi Pendapatan Asli Daerah per Tahun</CardTitle>
                     <CardDescription>
                         Tahun {Math.min(...chartData.map(item => item.tahun))} - {Math.max(...chartData.map(item => item.tahun))}
                     </CardDescription>
