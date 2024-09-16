@@ -8,8 +8,14 @@ import { DataRealisasiTahunanChart } from './components/data-realisasi-tahunan.c
 import { CombinedCharts } from './components/new-jumlah-daerah.chart'
 import { Separator } from '@/components/ui/separator'
 import { PeringkatPajakProvChart } from './components/peringkat-pajak-prov.chart'
-import { useState, useEffect } from 'react';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useState, useEffect } from 'react'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 
 export type JumlahDaerahItem = {
   jumlah_daerah: number
@@ -48,20 +54,20 @@ type DataRealisasiResponse = {
 }
 
 type PajakProvItem = {
-  jns_pemda: string;
-  kode_jenis: string;
-  nama_daerah: string;
-  nama_jenis: string;
-  persentase: number;
-  realisasi: number;
-  tahun: number;
-  target: number;
-};
+  jns_pemda: string
+  kode_jenis: string
+  nama_daerah: string
+  nama_jenis: string
+  persentase: number
+  realisasi: number
+  tahun: number
+  target: number
+}
 
 type PajakProvData = {
-  data_terendah: PajakProvItem[];
-  data_tertinggi: PajakProvItem[];
-};
+  data_terendah: PajakProvItem[]
+  data_tertinggi: PajakProvItem[]
+}
 
 type PajakProvResponse = {
   data: PajakProvData
@@ -74,7 +80,7 @@ export function usePajakProvData() {
   return useQuery<PajakProvResponse>({
     queryKey: ['pajakProv'],
     queryFn: async () => {
-      const response = await api.get("/pendapatan/peringkat/data-pajak-prov")
+      const response = await api.get('/pendapatan/peringkat/data-pajak-prov')
       return response.data
     },
   })
@@ -84,7 +90,7 @@ export function useJumlahDaerahData() {
   return useQuery<JumlahDaerahResponse>({
     queryKey: ['jumlahDaerah'],
     queryFn: async () => {
-      const response = await api.get("/pendapatan/dashboard/jumlah-daerah")
+      const response = await api.get('/pendapatan/dashboard/jumlah-daerah')
       return response.data
     },
   })
@@ -94,37 +100,42 @@ export function useDataRealisasiTahunan() {
   return useQuery<DataRealisasiResponse>({
     queryKey: ['dataRealisasiTahunan'],
     queryFn: async () => {
-      const response = await api.get("/pendapatan/dashboard/data-realiasi-tahuan")
+      const response = await api.get(
+        '/pendapatan/dashboard/data-realiasi-tahuan'
+      )
       return response.data
     },
   })
 }
 
 export default function Dashboard() {
-  const years = [2021, 2022, 2023];
+  const years = [2021, 2022, 2023, 2024]
 
-  const jumlahDaerahQuery = useJumlahDaerahData();
-  const dataRealisasiTahunanQuery = useDataRealisasiTahunan();
+  const jumlahDaerahQuery = useJumlahDaerahData()
+  const dataRealisasiTahunanQuery = useDataRealisasiTahunan()
   // const pajakProvQuery = usePajakProvData();
-  const [selectedYear, setSelectedYear] = useState<number>(years[0]);
-  const [data, setData] = useState<PajakProvData | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [selectedYear, setSelectedYear] = useState<number>(years[0])
+  const [data, setData] = useState<PajakProvData | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
-    fetchData(selectedYear);
-  }, [selectedYear]);
+    fetchData(selectedYear)
+  }, [selectedYear])
 
   const fetchData = async (year: number) => {
-    setIsLoading(true);
+    setIsLoading(true)
     try {
-      const response = await api.post<PajakProvResponse>("/pendapatan/peringkat/data-pajak-prov", { tahun: year });
-      setData(response.data.data);
+      const response = await api.post<PajakProvResponse>(
+        '/pendapatan/peringkat/data-pajak-prov',
+        { tahun: year }
+      )
+      setData(response.data.data)
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error('Error fetching data:', error)
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   return (
     <Layout>
@@ -149,39 +160,49 @@ export default function Dashboard() {
           <div className='w-full overflow-x-auto pb-2'>
             <TabsList>
               <TabsTrigger value='gambaran-umum'>Gambaran Umum</TabsTrigger>
-              <TabsTrigger value='detail-rincian-data'>Detail Rincian Data</TabsTrigger>
+              <TabsTrigger value='detail-rincian-data'>
+                Detail Rincian Data
+              </TabsTrigger>
             </TabsList>
           </div>
           <TabsContent value='gambaran-umum' className='space-y-4'>
             <CombinedCharts
               dataRealisasi={dataRealisasiTahunanQuery.data?.data || []}
               dataJumlahDaerah={jumlahDaerahQuery.data?.data || []}
-              isLoading={dataRealisasiTahunanQuery.isLoading || jumlahDaerahQuery.isLoading}
+              isLoading={
+                dataRealisasiTahunanQuery.isLoading ||
+                jumlahDaerahQuery.isLoading
+              }
             />
           </TabsContent>
+          <Separator className='my-4 flex-none' />
           <TabsContent value='detail-rincian-data' className='space-y-4'>
-            <h2 className='text-xl font-bold tracking-tight'>Detail Rincian Data</h2>
+            <div className='flex items-center justify-between'>
+              <h4 className='text-lg font-bold'>
+                DETAIL RINCI DATA NASIONAL TAHUN {selectedYear}
+              </h4>
+              <Select
+                onValueChange={(value) => setSelectedYear(Number(value))}
+                value={selectedYear?.toString() || ''}
+              >
+                <SelectTrigger className='w-[180px] bg-card'>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {years.map((year) => (
+                    <SelectItem key={year} value={year.toString()}>
+                      {year}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <Separator className='my-4 flex-none' />
             <DataRealisasiTahunanChart
               isLoading={dataRealisasiTahunanQuery.isLoading}
               data={dataRealisasiTahunanQuery.data?.data || []}
+              selectedYear={selectedYear}
             />
-            <Separator className='my-4 flex-none' />
-            <h2 className='text-xl font-bold tracking-tight'>Peringkat Pajak Provinsi</h2>
-            <Select
-              onValueChange={(value) => setSelectedYear(Number(value))}
-              value={selectedYear.toString()}
-            >
-              <SelectTrigger className="w-[180px] bg-card">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {years.map((year) => (
-                  <SelectItem key={year} value={year.toString()}>
-                    {year}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
             <PeringkatPajakProvChart
               data={data}
               isLoading={isLoading}
@@ -193,4 +214,3 @@ export default function Dashboard() {
     </Layout>
   )
 }
-

@@ -1,7 +1,5 @@
-import { useState, useEffect } from 'react';
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis, ResponsiveContainer, Cell } from "recharts";
 import { TrendingUp, TrendingDown, Download } from "lucide-react";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import {
     Card,
@@ -33,6 +31,7 @@ type DataRealisasiItem = {
 type DataRealisasiTahunanChartProps = {
     data: DataRealisasiItem[];
     isLoading: boolean;
+    selectedYear: number;
 };
 
 const chartConfig = {
@@ -147,14 +146,8 @@ function SkeletonLoader() {
     );
 }
 
-export function DataRealisasiTahunanChart({ data, isLoading }: DataRealisasiTahunanChartProps) {
-    const [selectedYear, setSelectedYear] = useState<number | null>(null);
+export function DataRealisasiTahunanChart({ data, isLoading,selectedYear  }: DataRealisasiTahunanChartProps) {
 
-    useEffect(() => {
-        if (data.length > 0 && !selectedYear) {
-            setSelectedYear(data[0].tahun);
-        }
-    }, [data, selectedYear]);
 
     if (isLoading) {
         return <SkeletonLoader />;
@@ -163,27 +156,11 @@ export function DataRealisasiTahunanChart({ data, isLoading }: DataRealisasiTahu
     if (!data || data.length === 0) {
         return <div>No data available</div>;
     }
-
-    const years = [...new Set(data.map(item => item.tahun))];
     const selectedData = data.filter(item => item.tahun === selectedYear).filter(item => item.kode_akun !== '4.1');
 
     return (
         <div className="space-y-4">
-            <Select
-                onValueChange={(value) => setSelectedYear(Number(value))}
-                value={selectedYear?.toString()}
-            >
-                <SelectTrigger className="w-[180px] bg-card">
-                    <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                    {years.map((year) => (
-                        <SelectItem key={year} value={year.toString()}>
-                            {year}
-                        </SelectItem>
-                    ))}
-                </SelectContent>
-            </Select>
+          
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {selectedData.map((item) => (

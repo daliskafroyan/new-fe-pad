@@ -15,6 +15,7 @@ import {
 import { formatLargeNumber } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
+import { Separator } from '@/components/ui/separator'
 import { useCurrentPng } from 'recharts-to-png';
 import FileSaver from 'file-saver';
 
@@ -55,7 +56,7 @@ const chartConfig = {
     },
 } satisfies ChartConfig;
 
-export function MergedDataCard({ data }: { data: PajakProvItem[] }) {
+export function MergedDataCard({ data, selectedYear }: { data: PajakProvItem[], selectedYear:number }) {
     const [getPng, { ref, isLoading }] = useCurrentPng();
     const chartData = data.map(item => ({
         name: item.nama_daerah,
@@ -75,7 +76,7 @@ export function MergedDataCard({ data }: { data: PajakProvItem[] }) {
         <Card className="w-full">
             <CardHeader className="flex flex-row items-center justify-between">
                 <div>
-                    <CardTitle>Peringkat Pajak Provinsi</CardTitle>
+                    <CardTitle>Peringkat 10 Pajak Provinsi Tahun {selectedYear} </CardTitle>
                     <CardDescription>Perbandingan Realisasi, Target, dan Persentase</CardDescription>
                 </div>
                 <Button variant="ghost" size="icon" onClick={handleDownload} disabled={isLoading}>
@@ -124,7 +125,7 @@ function SkeletonLoader() {
     );
 }
 
-function PersentaseChart({ data }: { data: (PajakProvItem & { isTopPerformer: boolean })[] }) {
+function PersentaseChart({ data, selectedYear }: { data: (PajakProvItem & { isTopPerformer: boolean })[], selectedYear:number }) {
     const [getPng, { ref, isLoading }] = useCurrentPng();
     const chartData = data.map(item => ({
         name: item.nama_daerah,
@@ -140,10 +141,10 @@ function PersentaseChart({ data }: { data: (PajakProvItem & { isTopPerformer: bo
     };
 
     return (
-        <Card className="w-full mt-4">
+        <Card className="w-full">
             <CardHeader className="flex flex-row items-center justify-between">
                 <div>
-                    <CardTitle>Persentase Realisasi Pajak Provinsi</CardTitle>
+                    <CardTitle>Persentase Realisasi Pajak Provinsi Tahun {selectedYear}</CardTitle>
                     <CardDescription>Persentase Realisasi terhadap Target</CardDescription>
                 </div>
                 <Button variant="ghost" size="icon" onClick={handleDownload} disabled={isLoading}>
@@ -188,9 +189,12 @@ export function PeringkatPajakProvChart({ data, isLoading, selectedYear }: Perin
 
     return (
         <>
-            <h3 className="text-lg font-bold">Data Peringkat Pajak Provinsi Tahun {selectedYear}</h3>
-            <MergedDataCard data={mergedData} />
-            <PersentaseChart data={mergedData} />
+            <Separator className='my-4 flex-none' />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <MergedDataCard data={mergedData} selectedYear={selectedYear}  />
+            <PersentaseChart data={mergedData} selectedYear={selectedYear} />
+        </div>
+            
         </>
     );
 }
