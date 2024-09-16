@@ -100,13 +100,13 @@ export default function Sidebar({
                 strokeLinejoin='round'
                 strokeWidth='16'
               ></line>
-              <span className='sr-only'>Website Name</span>
+              <span className='sr-only'>PORTAL DATA - PENDAPATAN ASLI DAERAH</span>
             </svg>
             <div
               className={`flex flex-col justify-end truncate ${isCollapsed ? 'invisible w-0' : 'visible w-auto'}`}
             >
-              <span className='font-medium'>SIDAPA</span>
-              <span className='text-xs'>Sistem Pendapatan Asli Daerah</span>
+              <span className='font-medium'>PORTAL DATA</span>
+              <span className='text-xs'>Pendapatan Asli Daerah</span>
             </div>
           </div>
 

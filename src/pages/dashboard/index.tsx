@@ -8,6 +8,8 @@ import { DataRealisasiTahunanChart } from './components/data-realisasi-tahunan.c
 import { CombinedCharts } from './components/new-jumlah-daerah.chart'
 import { Separator } from '@/components/ui/separator'
 import { PeringkatPajakProvChart } from './components/peringkat-pajak-prov.chart'
+import { PeringkatPajakKabChart } from './components/peringkat-pajak-kab.chart'
+import { PeringkatPajakKotaChart } from './components/peringkat-pajak-kota.chart'
 import { useState, useEffect } from 'react'
 import {
   Select,
@@ -76,14 +78,50 @@ type PajakProvResponse = {
   status_code: number
 }
 
-export function usePajakProvData() {
-  return useQuery<PajakProvResponse>({
-    queryKey: ['pajakProv'],
-    queryFn: async () => {
-      const response = await api.get('/pendapatan/peringkat/data-pajak-prov')
-      return response.data
-    },
-  })
+type PajakKabItem = {
+  jns_pemda: string
+  kode_jenis: string
+  nama_daerah: string
+  nama_jenis: string
+  persentase: number
+  realisasi: number
+  tahun: number
+  target: number
+}
+
+type PajakKabData = {
+  data_terendah: PajakKabItem[]
+  data_tertinggi: PajakKabItem[]
+}
+
+type PajakKabResponse = {
+  data: PajakKabData
+  message: string
+  status: boolean
+  status_code: number
+}
+
+type PajakKotaItem = {
+  jns_pemda: string
+  kode_jenis: string
+  nama_daerah: string
+  nama_jenis: string
+  persentase: number
+  realisasi: number
+  tahun: number
+  target: number
+}
+
+type PajakKotaData = {
+  data_terendah: PajakKotaItem[]
+  data_tertinggi: PajakKotaItem[]
+}
+
+type PajakKotaResponse = {
+  data: PajakKotaData
+  message: string
+  status: boolean
+  status_code: number
 }
 
 export function useJumlahDaerahData() {
@@ -100,40 +138,73 @@ export function useDataRealisasiTahunan() {
   return useQuery<DataRealisasiResponse>({
     queryKey: ['dataRealisasiTahunan'],
     queryFn: async () => {
-      const response = await api.get(
-        '/pendapatan/dashboard/data-realiasi-tahuan'
-      )
+      const response = await api.get('/pendapatan/dashboard/data-realiasi-tahuan')
       return response.data
     },
   })
 }
 
 export default function Dashboard() {
-  const years = [2021, 2022, 2023, 2024]
+  const years = [2019, 2020, 2021, 2022, 2023, 2024]
 
   const jumlahDaerahQuery = useJumlahDaerahData()
   const dataRealisasiTahunanQuery = useDataRealisasiTahunan()
-  // const pajakProvQuery = usePajakProvData();
   const [selectedYear, setSelectedYear] = useState<number>(years[0])
-  const [data, setData] = useState<PajakProvData | null>(null)
-  const [isLoading, setIsLoading] = useState(false)
+  const [dataProv, setDataProv] = useState<PajakProvData | null>(null)
+  const [dataKab, setDataKab] = useState<PajakKabData | null>(null)
+  const [dataKota, setDataKota] = useState<PajakKotaData | null>(null)
+  const [isLoadingProv, setIsLoadingProv] = useState(false)
+  const [isLoadingKab, setIsLoadingKab] = useState(false)
+  const [isLoadingKota, setIsLoadingKota] = useState(false)
 
   useEffect(() => {
-    fetchData(selectedYear)
+    fetchProvData(selectedYear)
+    fetchKabData(selectedYear)
+    fetchKotaData(selectedYear)
   }, [selectedYear])
 
-  const fetchData = async (year: number) => {
-    setIsLoading(true)
+  const fetchProvData = async (year: number) => {
+    setIsLoadingProv(true)
     try {
       const response = await api.post<PajakProvResponse>(
         '/pendapatan/peringkat/data-pajak-prov',
         { tahun: year }
       )
-      setData(response.data.data)
+      setDataProv(response.data.data)
     } catch (error) {
-      console.error('Error fetching data:', error)
+      console.error('Error fetching Prov data:', error)
     } finally {
-      setIsLoading(false)
+      setIsLoadingProv(false)
+    }
+  }
+
+  const fetchKabData = async (year: number) => {
+    setIsLoadingKab(true)
+    try {
+      const response = await api.post<PajakKabResponse>(
+        '/pendapatan/peringkat/data-pajak-kab',
+        { tahun: year }
+      )
+      setDataKab(response.data.data)
+    } catch (error) {
+      console.error('Error fetching Kab data:', error)
+    } finally {
+      setIsLoadingKab(false)
+    }
+  }
+
+  const fetchKotaData = async (year: number) => {
+    setIsLoadingKota(true)
+    try {
+      const response = await api.post<PajakKotaResponse>(
+        '/pendapatan/peringkat/data-pajak-kota',
+        { tahun: year }
+      )
+      setDataKota(response.data.data)
+    } catch (error) {
+      console.error('Error fetching Kab data:', error)
+    } finally {
+      setIsLoadingKota(false)
     }
   }
 
@@ -204,8 +275,18 @@ export default function Dashboard() {
               selectedYear={selectedYear}
             />
             <PeringkatPajakProvChart
-              data={data}
-              isLoading={isLoading}
+              data={dataProv}
+              isLoading={isLoadingProv}
+              selectedYear={selectedYear}
+            />
+            <PeringkatPajakKabChart
+              data={dataKab}
+              isLoading={isLoadingKab}
+              selectedYear={selectedYear}
+            />
+            <PeringkatPajakKotaChart
+              data={dataKota}
+              isLoading={isLoadingKota}
               selectedYear={selectedYear}
             />
           </TabsContent>
